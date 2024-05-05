@@ -31,6 +31,8 @@ dependencies {
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("org.postgresql:postgresql")
 }
 
 tasks.withType<Test> {
@@ -42,10 +44,6 @@ tasks.test {
 	finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
 }
 
-tasks.test {
-	useJUnitPlatform()
-	finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
-}
 tasks.jacocoTestReport {
 	classDirectories.setFrom(files(classDirectories.files.map {
 		fileTree(it) { exclude("**/*Application**") }
