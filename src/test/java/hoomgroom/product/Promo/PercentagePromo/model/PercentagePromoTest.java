@@ -1,4 +1,4 @@
-package hoomgroom.product.Promo;
+package hoomgroom.product.Promo.PercentagePromo.model;
 
 import hoomgroom.product.Promo.model.Factory.PercentagePromoFactory;
 import hoomgroom.product.Promo.model.PercentagePromo;
@@ -17,7 +17,7 @@ public class PercentagePromoTest {
     @BeforeEach
     void setUp(){
         this.promo = factory.createPromo();
-        this.promo.setUuid(UUID.fromString("898e0bf5-9fa3-4815-92a5-0e9c422f9c3a"));
+        this.promo.setId(UUID.fromString("898e0bf5-9fa3-4815-92a5-0e9c422f9c3a"));
         this.promo.setName("BELANJAHEMAT20");
         this.promo.setDescription("Promo ini mengurangi harga sebesar 20 persen");
         this.promo.setMinimumPurchase(50000L);
@@ -26,7 +26,7 @@ public class PercentagePromoTest {
 
     @Test
     void testGetPercentagePromoId() {
-        assertEquals(UUID.fromString("898e0bf5-9fa3-4815-92a5-0e9c422f9c3a"), this.promo.getUuid());
+        assertEquals(UUID.fromString("898e0bf5-9fa3-4815-92a5-0e9c422f9c3a"), this.promo.getId());
     }
 
     @Test
