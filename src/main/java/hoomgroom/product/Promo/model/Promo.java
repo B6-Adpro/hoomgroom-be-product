@@ -1,19 +1,30 @@
 package hoomgroom.product.Promo.model;
 
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
 @Setter
+@MappedSuperclass
 public class Promo {
-    UUID uuid;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID Id;
+
+    @Column(name = "name", nullable = false)
     String name;
+
+    @Column(name = "description")
     String description;
-    Date expirationDate;
+    @Column(name = "expiration_date")
+    LocalDateTime expirationDate;
+
+    @Column(name = "minimum_purchase")
     Long minimumPurchase;
 
     public Promo() {}
