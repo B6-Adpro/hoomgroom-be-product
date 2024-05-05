@@ -37,7 +37,6 @@ public class FixedAmountPromoServiceImplTest {
     FixedAmountPromoRequest createRequest;
     FixedAmountPromoRequest updateRequest;
 
-    FixedAmountPromoRequest emptyRequest;
     @BeforeEach
     void setUp() {
         promo = promoFactory.createPromo();
@@ -71,8 +70,6 @@ public class FixedAmountPromoServiceImplTest {
                 .minimumPurchase(50000L)
                 .expirationDate(LocalDateTime.of(2024, 6, 4, 0, 0))
                 .build();
-
-        emptyRequest = FixedAmountPromoRequest.builder().build();
     }
 
     @Test
