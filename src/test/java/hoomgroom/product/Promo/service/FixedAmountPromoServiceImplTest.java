@@ -1,10 +1,9 @@
-package hoomgroom.product.Promo.FixedAmountPromo.service;
+package hoomgroom.product.Promo.service;
 
 import hoomgroom.product.Promo.dto.FixedAmountPromoRequest;
 import hoomgroom.product.Promo.model.Factory.FixedAmountPromoFactory;
 import hoomgroom.product.Promo.model.FixedAmountPromo;
 import hoomgroom.product.Promo.repository.FixedAmountPromoRepository;
-import hoomgroom.product.Promo.service.FixedAmountPromoServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -101,9 +100,7 @@ public class FixedAmountPromoServiceImplTest {
     void whenFindByIdAndNotFoundShouldReturnEmpty() {
         when(promoRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> {
-            promoService.findById(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551"));
-        });
+        assertThrows(NoSuchElementException.class, () -> promoService.findById(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")));
     }
 
     @Test
@@ -147,9 +144,7 @@ public class FixedAmountPromoServiceImplTest {
     @Test
     void whenUpdateFixedAmountPromoAndNotFoundShouldThrowException() {
         when(promoRepository.findById(eq(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")))).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> {
-            promoService.update(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551"), createRequest);
-        });
+        assertThrows(NoSuchElementException.class, () -> promoService.update(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551"), createRequest));
     }
 
     @Test
@@ -163,8 +158,6 @@ public class FixedAmountPromoServiceImplTest {
     @Test
     void whenDeleteFixedAmountPromoAndNotFoundShouldThrowException() {
         when(promoRepository.findById(eq(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")))).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> {
-            promoService.delete(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551"));
-        });
+        assertThrows(NoSuchElementException.class, () -> promoService.delete(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")));
     }
 }

@@ -1,7 +1,6 @@
-package hoomgroom.product.Promo.FixedAmountPromo.model;
+package hoomgroom.product.Promo.model;
 
 import hoomgroom.product.Promo.model.Factory.FixedAmountPromoFactory;
-import hoomgroom.product.Promo.model.FixedAmountPromo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

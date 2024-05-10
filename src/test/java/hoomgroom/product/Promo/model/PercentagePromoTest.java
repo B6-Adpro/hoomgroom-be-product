@@ -1,7 +1,6 @@
-package hoomgroom.product.Promo.PercentagePromo.model;
+package hoomgroom.product.Promo.model;
 
 import hoomgroom.product.Promo.model.Factory.PercentagePromoFactory;
-import hoomgroom.product.Promo.model.PercentagePromo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
