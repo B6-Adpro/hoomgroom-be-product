@@ -10,7 +10,8 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Promo {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,6 +27,4 @@ public class Promo {
 
     @Column(name = "minimum_purchase")
     Long minimumPurchase;
-
-    public Promo() {}
 }
