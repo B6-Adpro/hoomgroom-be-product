@@ -3,6 +3,15 @@ plugins {
 	id("org.springframework.boot") version "3.2.4"
 	id("io.spring.dependency-management") version "1.1.4"
 	jacoco
+	id("org.sonarqube") version "4.4.1.3373"
+}
+
+sonar {
+	properties {
+		property("sonar.projectKey", "B6-Adpro_hoomgroom-be-product")
+		property("sonar.organization", "b6-adpro")
+		property("sonar.host.url", "https://sonarcloud.io")
+	}
 }
 
 group = "com.hoomgroom"
