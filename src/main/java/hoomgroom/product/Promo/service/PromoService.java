@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface PromoService {
     List<Promo> findAll();
     Promo findById(UUID uuid);
+    void delete(UUID uuid);
 }

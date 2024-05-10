@@ -29,4 +29,15 @@ public class PromoServiceImpl implements PromoService {
         }
         return promo.get();
     }
+
+    @Override
+    public void delete(UUID id) {
+        Optional<Promo> promo = promoRepository.findById(id);
+
+        if (promo.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
+        promoRepository.delete(promo.get());
+    }
 }
