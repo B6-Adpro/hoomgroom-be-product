@@ -30,7 +30,7 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build and analyze
         env:
-          JBDC_DATABASE_URL: ${{ secrets.JDBC_DATABASE_URL }}
+          JDBC_DATABASE_URL: ${{ secrets.JDBC_DATABASE_URL }}
           JDBC_DATABASE_USERNAME: ${{ secrets.JDBC_DATABASE_USERNAME }}
           JDBC_DATABASE_PASSWORD: ${{ secrets.JDBC_DATABASE_PASSWORD }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
