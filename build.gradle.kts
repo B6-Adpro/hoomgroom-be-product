@@ -44,23 +44,41 @@ dependencies {
 	implementation("org.postgresql:postgresql")
 }
 
-tasks.withType<Test> {
+tasks.register<Test>("unitTest"){
+	description = "Runs unit test."
+	group = "verification"
+
+	filter{
+		excludeTestsMatching("*FunctionalTest")
+	}
+}
+
+tasks.register<Test>("functionalTest"){
+	description = "Runs functional test."
+	group = "verification"
+
+	filter{
+		excludeTestsMatching("*FunctionalTest")
+	}
+}
+
+tasks.withType<Test>().configureEach {
 	useJUnitPlatform()
 }
 
 tasks.test {
-	useJUnitPlatform()
-	finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+	filter {
+		excludeTestsMatching("*FunctionalTest")
+	}
+
+	finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.jacocoTestReport {
-	classDirectories.setFrom(files(classDirectories.files.map {
-		fileTree(it) { exclude("**/*Application**") }
-	}))
-	dependsOn(tasks.test) // tests are required to run before generating the report
+	dependsOn(tasks.test)
+
 	reports {
-		xml.required.set(false)
-		csv.required.set(false)
-		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+		html.required = true
+		xml.required = true
 	}
 }
