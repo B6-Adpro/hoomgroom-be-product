@@ -107,5 +107,5 @@ jobs:
         run: chmod 400 ssh-key.pem
       - name: Deploy to GCP
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.GCP_USERNAME }}@${{ secrets.GCP_STATIC_IP }} "
+          ssh -o StrictHostKeyChecking=no -i ssh-key.pem ${{ secrets.GCP_USERNAME }}@${{ secrets.GCP_STATIC_IP }} "
           sudo docker-compose -f /docker-compose.yml up -d"

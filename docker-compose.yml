@@ -10,5 +10,3 @@ services:
       - SPRING_DATASOURCE_USERNAME=${JDBC_DATABASE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${JDBC_DATABASE_PASSWORD}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
-    depends_on:
-      - database
