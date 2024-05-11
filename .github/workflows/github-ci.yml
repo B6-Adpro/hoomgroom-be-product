@@ -108,5 +108,4 @@ jobs:
       - name: Deploy to GCP
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.GCP_USERNAME }}@${{ secrets.GCP_STATIC_IP }} "
-            cd /path/to/your/application &&
-            sudo docker-compose up -d"
+          sudo docker-compose -f /docker-compose.yml up -d"
