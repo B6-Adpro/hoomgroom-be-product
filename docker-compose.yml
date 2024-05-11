@@ -12,11 +12,3 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
     depends_on:
       - database
-
-  database:
-    image: postgres:latest
-    environment:
-      - POSTGRES_USER=${JDBC_DATABASE_USERNAME}
-      - POSTGRES_PASSWORD=${JDBC_DATABASE_PASSWORD}
-    ports:
-      - "5432:5432"
