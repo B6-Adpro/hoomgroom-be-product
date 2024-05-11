@@ -108,10 +108,11 @@ jobs:
       - name: Deploy to GCP
         run: |
           ssh -o StrictHostKeyChecking=no -i ssh-key.pem ${{ secrets.GCP_USERNAME }}@${{ secrets.GCP_STATIC_IP }} "
-          sudo docker container rm -f ${{ secrets.CONTAINER_NAME }} || true &&
-          sudo docker image rm -f ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} || true &&
-          sudo docker run --name ${{ secrets.CONTAINER_NAME }} -d \
-            -e JDBC_DATABASE_URL=${{ secrets.JDBC_DATABASE_URL }} \
-            -e JDBC_DATABASE_USERNAME=${{ secrets.JDBC_DATABASE_USERNAME }} \
-            -e JDBC_DATABASE_PASSWORD=${{ secrets.JDBC_DATABASE_PASSWORD }} \
-            -p 80:8080 ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}"
+            sudo docker container rm -f ${{ secrets.CONTAINER_NAME }} || true &&
+            sudo docker image rm -f ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} || true &&
+            sudo docker run --name ${{ secrets.CONTAINER_NAME }} -d \
+              '-e JDBC_DATABASE_URL=${{ secrets.JDBC_DATABASE_URL }}' \
+              '-e JDBC_DATABASE_USERNAME=${{ secrets.JDBC_DATABASE_USERNAME }}' \
+              '-e JDBC_DATABASE_PASSWORD=${{ secrets.JDBC_DATABASE_PASSWORD }}' \
+              -p 80:8080 \
+              ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}"
