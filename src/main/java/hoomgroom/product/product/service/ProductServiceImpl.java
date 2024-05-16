@@ -1,5 +1,6 @@
 package hoomgroom.product.product.service;
 
+import hoomgroom.product.product.dto.ProductData;
 import hoomgroom.product.product.model.Product;
 import hoomgroom.product.product.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,33 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
 
     @Override
-    public Product create(Product product) {
+    public Product create(ProductData productData) {
+        Product product = Product.builder()
+                .name(productData.getName())
+                .tags(productData.getTags())
+                .description(productData.getDescription())
+                .imageLink(productData.getImageLink())
+                .originalPrice(productData.getOriginalPrice())
+                .discountPercentage(productData.getDiscountPercentage())
+                .totalSales(0)
+                .build();
         productRepository.create(product);
         return product;
     }
 
     @Override
-    public Product update(String targetId, Product newProduct) {
+    public Product update(String targetId, ProductData newData) {
+        Product product = productRepository.findById(targetId);
+        Product newProduct = Product.builder()
+                .id(product.getId())
+                .name(newData.getName())
+                .tags(newData.getTags())
+                .description(newData.getDescription())
+                .imageLink(newData.getImageLink())
+                .originalPrice(newData.getOriginalPrice())
+                .discountPercentage(newData.getDiscountPercentage())
+                .totalSales(product.getTotalSales())
+                .build();
         productRepository.update(targetId, newProduct);
         return newProduct;
     }

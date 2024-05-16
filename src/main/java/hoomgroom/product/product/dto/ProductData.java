@@ -16,5 +16,4 @@ public class ProductData {
     private String imageLink;
     private Long originalPrice;
     private Integer discountPercentage;
-    private Integer totalSales;
 }
