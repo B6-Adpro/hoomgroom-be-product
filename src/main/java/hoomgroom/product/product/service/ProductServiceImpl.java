@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -31,7 +32,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product update(String targetId, ProductData newData) {
+    public Product update(UUID targetId, ProductData newData) {
         Product product = productRepository.findById(targetId);
         Product newProduct = Product.builder()
                 .id(product.getId())
@@ -48,7 +49,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void delete(String targetId) {
+    public void delete(UUID targetId) {
         productRepository.delete(targetId);
     }
 
@@ -61,7 +62,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product findById(String targetId) {
+    public Product findById(UUID targetId) {
         return productRepository.findById(targetId);
     }
 }

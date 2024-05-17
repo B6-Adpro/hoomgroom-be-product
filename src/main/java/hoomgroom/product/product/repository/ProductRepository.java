@@ -21,7 +21,7 @@ public class ProductRepository {
         return product;
     }
 
-    public Product update(String targetId, Product newProduct) {
+    public Product update(UUID targetId, Product newProduct) {
         for (int i = 0; i < productData.size(); i++) {
             Product product = productData.get(i);
             if (product.getId().equals(targetId)) {
@@ -34,7 +34,7 @@ public class ProductRepository {
         return null;
     }
 
-    public void delete(String targetId) {
+    public void delete(UUID targetId) {
         productData.remove(findById(targetId));
     }
 
@@ -42,7 +42,7 @@ public class ProductRepository {
         return productData.iterator();
     }
 
-    public Product findById(String targetId) {
+    public Product findById(UUID targetId) {
         for (Product product : productData) {
             if (product.getId().equals(targetId)) {
                 return product;
