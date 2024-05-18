@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -16,10 +18,21 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @GetMapping("/")
+    @GetMapping("/list")
     public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> products = productService.findAll();
 
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<Product>> getFilteredProducts(
+            @RequestParam(defaultValue = "") List<String> tags,
+            @RequestParam(defaultValue = "0") Long minValue,
+            @RequestParam(defaultValue = "" + Long.MAX_VALUE) Long maxValue,
+            @RequestParam(defaultValue = "false") Boolean hasDiscount
+    ) {
+        List<Product> products = productService.findByFilter(tags, minValue, maxValue, hasDiscount);
         return ResponseEntity.ok(products);
     }
 

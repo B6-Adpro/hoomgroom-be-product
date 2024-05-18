@@ -3,6 +3,7 @@ package hoomgroom.product.product.service;
 import hoomgroom.product.product.dto.ProductData;
 import hoomgroom.product.product.model.Product;
 import hoomgroom.product.product.repository.ProductRepository;
+import hoomgroom.product.product.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +60,17 @@ public class ProductServiceImpl implements ProductService {
         List<Product> allProduct = new ArrayList<>();
         productIterator.forEachRemaining(allProduct::add);
         return allProduct;
+    }
+
+    @Override
+    public List<Product> findByFilter(List<String> tags, Long minValue, Long maxValue, Boolean maxDiscount) {
+        SearchFilter searchFilter = SearchFilter.link(
+                new TagFilter(tags),
+                new PriceFilter(minValue, maxValue),
+                new DiscountFilter(maxDiscount)
+        );
+
+        return searchFilter.filter(findAll());
     }
 
     @Override

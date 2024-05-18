@@ -11,5 +11,6 @@ public interface ProductService {
     Product update(UUID targetId, ProductData newData);
     void delete(UUID targetId);
     List<Product> findAll();
+    List<Product> findByFilter(List<String> tags, Long minValue, Long maxValue, Boolean maxDiscount);
     Product findById(UUID targetId);
 }
