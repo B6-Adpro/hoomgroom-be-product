@@ -1,6 +1,7 @@
-package hoomgroom.product.product.model;
+package hoomgroom.product.product.util;
 
-import java.util.Collections;
+import hoomgroom.product.product.model.Product;
+
 import java.util.List;
 import java.util.stream.Collectors;
 

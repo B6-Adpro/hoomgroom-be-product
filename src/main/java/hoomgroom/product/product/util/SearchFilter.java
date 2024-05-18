@@ -1,4 +1,6 @@
-package hoomgroom.product.product.model;
+package hoomgroom.product.product.util;
+
+import hoomgroom.product.product.model.Product;
 
 import java.util.List;
 
