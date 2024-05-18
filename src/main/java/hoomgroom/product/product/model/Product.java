@@ -19,4 +19,9 @@ public class Product {
     private Long originalPrice;
     private Integer discountPercentage;
     private Integer totalSales;
+
+    public Long getDiscountedPrice() {
+        Double discountMultiplier = (100 - this.discountPercentage) / 100.0;
+        return (long) (this.originalPrice * (discountMultiplier));
+    }
 }
