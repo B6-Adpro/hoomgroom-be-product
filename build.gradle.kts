@@ -6,6 +6,14 @@ plugins {
 	id("org.sonarqube") version "4.4.1.3373"
 }
 
+sonar {
+	properties {
+		property("sonar.projectKey", "B6-Adpro_hoomgroom-be-product")
+		property("sonar.organization", "b6-adpro")
+		property("sonar.host.url", "https://sonarcloud.io")
+	}
+}
+
 group = "com.hoomgroom"
 version = "0.0.1-SNAPSHOT"
 
