@@ -16,6 +16,9 @@ public class FixedAmountPromo extends Promo {
 
     @Override
     public Long applyPromo(Long totalPrice) {
-        return totalPrice - discountAmount;
+        if (totalPrice >= minimumPurchase) {
+            return totalPrice - discountAmount;
+        }
+        return 0L;
     }
 }
