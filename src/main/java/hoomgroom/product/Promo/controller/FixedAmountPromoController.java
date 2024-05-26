@@ -1,51 +1,65 @@
-package hoomgroom.product.Promo.controller;
+package hoomgroom.product.promo.controller;
 
-import hoomgroom.product.Promo.dto.FixedAmountPromoRequest;
-import hoomgroom.product.Promo.model.FixedAmountPromo;
-import hoomgroom.product.Promo.service.FixedAmountPromoService;
+import hoomgroom.product.auth.service.JwtServiceImpl;
+import hoomgroom.product.promo.dto.FixedAmountPromoRequest;
+import hoomgroom.product.promo.dto.PromoResponse;
+import hoomgroom.product.promo.model.FixedAmountPromo;
+import hoomgroom.product.promo.service.FixedAmountPromoService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/promo/fixed")
 @RequiredArgsConstructor
 public class FixedAmountPromoController {
     private final FixedAmountPromoService service;
+    private final JwtServiceImpl jwtService;
     @GetMapping("/")
-    public ResponseEntity<List<FixedAmountPromo>> getAllFixedAmountPromo() {
-        List<FixedAmountPromo> response = service.findAll();
-        return ResponseEntity.ok(response);
-    }
-    @GetMapping("/{id}")
-    public ResponseEntity<FixedAmountPromo> getFixedAmountPromoById(@PathVariable UUID id) {
-        FixedAmountPromo response = service.findById(id);
-        return ResponseEntity.ok(response);
+    public CompletableFuture<ResponseEntity<List<FixedAmountPromo>>> getAllFixedAmountPromo() {
+        return service.findAll().thenApply(ResponseEntity::ok);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<FixedAmountPromo> createFixedAmountPromo(@RequestBody FixedAmountPromoRequest request) {
-        FixedAmountPromo response = service.create(request);
-        return ResponseEntity.ok(response);
-    }
-    @PutMapping("/update/{id}")
-    public ResponseEntity<FixedAmountPromo> updateFixedAmountPromo(@PathVariable UUID id, @RequestBody FixedAmountPromoRequest request) {
-        FixedAmountPromo response = service.update(id, request);
-        return ResponseEntity.ok(response);
+    public CompletableFuture<ResponseEntity<PromoResponse>> createFixedAmountPromo(
+            @NonNull HttpServletRequest request,
+            @RequestBody FixedAmountPromoRequest requestBody
+    ) {
+        boolean isAuthenticated = jwtService.isAuthenticated(request);
+
+        if (!isAuthenticated) {
+            PromoResponse response = PromoResponse
+                    .builder()
+                    .message("ADMIN Only")
+                    .build();
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response));
+        }
+        return service.create(requestBody);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteFixedAmountPromo(@PathVariable UUID id) {
-        try {
-            service.delete(id);
-            return ResponseEntity.ok(String.format("Successfully deleted Promo with id %s", id.toString()));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Promo not found");
+    @PutMapping("/update/{id}")
+    public CompletableFuture<ResponseEntity<PromoResponse>> updateFixedAmountPromo(
+            @NonNull HttpServletRequest request,
+            @PathVariable UUID id,
+            @RequestBody FixedAmountPromoRequest requestBody
+    ) {
+        boolean isAuthenticated = jwtService.isAuthenticated(request);
+
+        if (!isAuthenticated) {
+            PromoResponse response = PromoResponse
+                    .builder()
+                    .message("ADMIN Only")
+                    .build();
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response));
         }
+
+        return service.update(id, requestBody);
     }
 }

@@ -1,53 +1,63 @@
-package hoomgroom.product.Promo.controller;
+package hoomgroom.product.promo.controller;
 
-import hoomgroom.product.Promo.dto.PercentagePromoRequest;
-import hoomgroom.product.Promo.model.PercentagePromo;
-import hoomgroom.product.Promo.service.PercentagePromoService;
+import hoomgroom.product.auth.service.JwtServiceImpl;
+import hoomgroom.product.promo.dto.PercentagePromoRequest;
+import hoomgroom.product.promo.dto.PromoResponse;
+import hoomgroom.product.promo.model.PercentagePromo;
+import hoomgroom.product.promo.service.PercentagePromoService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/promo/percent")
 @RequiredArgsConstructor
 public class PercentagePromoController {
+    private final JwtServiceImpl jwtService;
     private final PercentagePromoService service;
     @GetMapping("/")
-    public ResponseEntity<List<PercentagePromo>> getAllPercentagePromo() {
-        List<PercentagePromo> response = service.findAll();
-        return ResponseEntity.ok(response);
-    }
-    @GetMapping("/{id}")
-    public ResponseEntity<PercentagePromo> getPercentagePromoById(@PathVariable UUID id) {
-        PercentagePromo response = service.findById(id);
-        return ResponseEntity.ok(response);
+    public CompletableFuture<ResponseEntity<List<PercentagePromo>>> getAllPercentagePromo() {
+        return service.findAll().thenApply(ResponseEntity::ok);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<PercentagePromo> createPercentagePromo(@RequestBody PercentagePromoRequest request) {
-        PercentagePromo response = service.create(request);
-        return ResponseEntity.ok(response);
+    public CompletableFuture<ResponseEntity<PromoResponse>> createPercentagePromo(
+            @NonNull HttpServletRequest request,
+            @RequestBody PercentagePromoRequest requestBody
+    ) {
+        boolean isAuthenticated = jwtService.isAuthenticated(request);
+
+        if (!isAuthenticated) {
+            PromoResponse response = PromoResponse
+                    .builder()
+                    .message("ADMIN Only")
+                    .build();
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response));
+        }
+        return service.create(requestBody);
     }
     @PutMapping("/update/{id}")
-    public ResponseEntity<PercentagePromo> updatePercentagePromo(@PathVariable UUID id,
-                                                                  @RequestBody PercentagePromoRequest request) {
-        PercentagePromo response = service.update(id, request);
-        return ResponseEntity.ok(response);
-    }
+    public CompletableFuture<ResponseEntity<PromoResponse>> updatePercentagePromo(
+        @NonNull HttpServletRequest request,
+        @PathVariable UUID id,
+        @RequestBody PercentagePromoRequest requestBody
+    ) {
+        boolean isAuthenticated = jwtService.isAuthenticated(request);
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deletePercentagePromo(@PathVariable UUID id) {
-        try {
-            service.delete(id);
-            return ResponseEntity.ok(String.format("Successfully deleted Promo with id %s", id.toString()));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Promo not found");
+        if (!isAuthenticated) {
+            PromoResponse response = PromoResponse
+                    .builder()
+                    .message("ADMIN Only")
+                    .build();
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response));
         }
+        return service.update(id, requestBody);
     }
-
 }
