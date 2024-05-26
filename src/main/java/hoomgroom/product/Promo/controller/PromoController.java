@@ -1,15 +1,18 @@
-package hoomgroom.product.Promo.controller;
+package hoomgroom.product.promo.controller;
 
-import hoomgroom.product.Promo.model.Promo;
-import hoomgroom.product.Promo.service.PromoService;
+import hoomgroom.product.promo.dto.PromoResponse;
+import hoomgroom.product.promo.dto.RedeemPromoRequest;
+import hoomgroom.product.promo.dto.RedeemResponse;
+import hoomgroom.product.promo.dto.Response;
+import hoomgroom.product.promo.model.Promo;
+import hoomgroom.product.promo.service.PromoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/promo")
@@ -19,27 +22,26 @@ public class PromoController {
 
     @GetMapping("/")
     public ResponseEntity<List<Promo>> getAllPromos() {
-        List<Promo> response = promoService.findAll();
-        return ResponseEntity.ok(response);
+        return promoService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getPromoById(@PathVariable UUID id) {
-        try {
-            Promo response = promoService.findById(id);
-            return ResponseEntity.ok(response);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Promo not found");
-        }
+    public ResponseEntity<PromoResponse> getPromoById(@PathVariable UUID id) {
+        return promoService.findById(id);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deletePromo(@PathVariable UUID id) {
-        try {
-            promoService.delete(id);
-            return ResponseEntity.ok(String.format("Successfully deleted Promo with id %s", id.toString()));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Promo not found");
-        }
+    public ResponseEntity<Response> deletePromo(
+            @PathVariable UUID id
+    ) throws ExecutionException, InterruptedException {
+        return promoService.delete(id);
+    }
+
+    @GetMapping("/redeem/{id}")
+    public ResponseEntity<RedeemResponse> redeemPromo(
+            @PathVariable UUID id,
+            @RequestBody RedeemPromoRequest requestBody
+    ) {
+        return promoService.redeem(requestBody.getTransactionId(), id, requestBody.getTotalPrice());
     }
 }

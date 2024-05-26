@@ -1,15 +1,14 @@
-package hoomgroom.product.Promo.controller;
+package hoomgroom.product.promo.controller;
 
-import hoomgroom.product.Promo.dto.PercentagePromoRequest;
-import hoomgroom.product.Promo.model.PercentagePromo;
-import hoomgroom.product.Promo.service.PercentagePromoService;
+import hoomgroom.product.promo.dto.PercentagePromoRequest;
+import hoomgroom.product.promo.dto.PromoResponse;
+import hoomgroom.product.promo.model.PercentagePromo;
+import hoomgroom.product.promo.service.PercentagePromoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RestController
@@ -19,35 +18,20 @@ public class PercentagePromoController {
     private final PercentagePromoService service;
     @GetMapping("/")
     public ResponseEntity<List<PercentagePromo>> getAllPercentagePromo() {
-        List<PercentagePromo> response = service.findAll();
-        return ResponseEntity.ok(response);
-    }
-    @GetMapping("/{id}")
-    public ResponseEntity<PercentagePromo> getPercentagePromoById(@PathVariable UUID id) {
-        PercentagePromo response = service.findById(id);
-        return ResponseEntity.ok(response);
+        return service.findAll();
     }
 
     @PostMapping("/create")
-    public ResponseEntity<PercentagePromo> createPercentagePromo(@RequestBody PercentagePromoRequest request) {
-        PercentagePromo response = service.create(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<PromoResponse> createPercentagePromo(
+            @RequestBody PercentagePromoRequest requestBody
+    ) {
+        return service.create(requestBody);
     }
     @PutMapping("/update/{id}")
-    public ResponseEntity<PercentagePromo> updatePercentagePromo(@PathVariable UUID id,
-                                                                  @RequestBody PercentagePromoRequest request) {
-        PercentagePromo response = service.update(id, request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<PromoResponse> updatePercentagePromo(
+            @PathVariable UUID id,
+            @RequestBody PercentagePromoRequest requestBody
+    ) {
+        return service.update(id, requestBody);
     }
-
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deletePercentagePromo(@PathVariable UUID id) {
-        try {
-            service.delete(id);
-            return ResponseEntity.ok(String.format("Successfully deleted Promo with id %s", id.toString()));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Promo not found");
-        }
-    }
-
 }
