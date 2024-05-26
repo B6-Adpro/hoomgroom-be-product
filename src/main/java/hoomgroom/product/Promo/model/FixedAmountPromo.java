@@ -1,4 +1,4 @@
-package hoomgroom.product.Promo.model;
+package hoomgroom.product.promo.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,4 +13,9 @@ import lombok.Setter;
 public class FixedAmountPromo extends Promo {
     @Column(name = "discount_amount")
     Long discountAmount;
+
+    @Override
+    public Long applyPromo(Long totalPrice) {
+        return totalPrice - discountAmount;
+    }
 }
