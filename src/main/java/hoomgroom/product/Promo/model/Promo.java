@@ -1,4 +1,4 @@
-package hoomgroom.product.Promo.model;
+package hoomgroom.product.promo.model;
 
 
 import jakarta.persistence.*;
@@ -12,10 +12,10 @@ import java.util.UUID;
 @Setter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public class Promo {
+public abstract class Promo {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID Id;
+    private UUID id;
 
     @Column(name = "name", nullable = false)
     String name;
@@ -27,4 +27,6 @@ public class Promo {
 
     @Column(name = "minimum_purchase")
     Long minimumPurchase;
+
+    public abstract Long applyPromo(Long totalPrice);
 }
