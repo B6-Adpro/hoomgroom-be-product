@@ -1,163 +1,265 @@
-package hoomgroom.product.Promo.service;
+package hoomgroom.product.promo.service;
 
-import hoomgroom.product.Promo.dto.FixedAmountPromoRequest;
-import hoomgroom.product.Promo.model.Factory.FixedAmountPromoFactory;
-import hoomgroom.product.Promo.model.FixedAmountPromo;
-import hoomgroom.product.Promo.repository.FixedAmountPromoRepository;
-import org.junit.jupiter.api.BeforeEach;
+import hoomgroom.product.promo.dto.FixedAmountPromoRequest;
+import hoomgroom.product.promo.dto.PromoResponse;
+import hoomgroom.product.promo.model.FixedAmountPromo;
+import hoomgroom.product.promo.repository.FixedAmountPromoRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class FixedAmountPromoServiceImplTest {
-    @InjectMocks
-    FixedAmountPromoServiceImpl promoService;
+class FixedAmountPromoServiceImplTest {
 
     @Mock
-    FixedAmountPromoRepository promoRepository;
+    private FixedAmountPromoRepository fixedAmountPromoRepository;
 
-    FixedAmountPromoFactory promoFactory = new FixedAmountPromoFactory();
+    @InjectMocks
+    private FixedAmountPromoServiceImpl promoService;
 
-    FixedAmountPromo promo;
-    FixedAmountPromo updatePromo;
-    FixedAmountPromoRequest createRequest;
-    FixedAmountPromoRequest updateRequest;
+    @Test
+    void testFindAll() {
+        FixedAmountPromo promo1 = new FixedAmountPromo();
+        promo1.setId(UUID.randomUUID());
+        promo1.setName("Promo 1");
+        FixedAmountPromo promo2 = new FixedAmountPromo();
+        promo2.setId(UUID.randomUUID());
+        promo2.setName("Promo 2");
+        List<FixedAmountPromo> promoList = Arrays.asList(promo1, promo2);
 
-    @BeforeEach
-    void setUp() {
-        promo = promoFactory.createPromo();
-        promo.setId(UUID.fromString("dcb2dff0-0cb0-4a79-98ab-8f0ec1bf39f7"));
-        promo.setName("BELANJAHEMAT20000");
-        promo.setDescription("Diskon belanja 20000");
-        promo.setDiscountAmount(20000L);
-        promo.setMinimumPurchase(100000L);
-        promo.setExpirationDate(LocalDateTime.of(2024, 6, 5, 0, 0));
+        when(fixedAmountPromoRepository.findAll()).thenReturn(promoList);
 
-        updatePromo = promoFactory.createPromo();
-        updatePromo.setId(UUID.fromString("2a727aac-8788-4242-b609-5752386f929c"));
-        updatePromo.setName("BELANJAHEMAT10000");
-        updatePromo.setDescription("Diskon belanja 10000");
-        updatePromo.setDiscountAmount(10000L);
-        updatePromo.setMinimumPurchase(50000L);
-        updatePromo.setExpirationDate(LocalDateTime.of(2024, 6, 4, 0, 0));
+        ResponseEntity<List<FixedAmountPromo>> responseEntity = promoService.findAll();
 
-        createRequest = FixedAmountPromoRequest.builder()
-                .name("BELANJAHEMAT20000")
-                .description("Diskon belanja 20000")
-                .discountAmount(20000L)
-                .minimumPurchase(100000L)
-                .expirationDate(LocalDateTime.of(2024, 6, 5, 0, 0))
-                .build();
-
-        updateRequest = FixedAmountPromoRequest.builder()
-                .name("BELANJAHEMAT10000")
-                .description("Diskon belanja 10000")
-                .discountAmount(10000L)
-                .minimumPurchase(50000L)
-                .expirationDate(LocalDateTime.of(2024, 6, 4, 0, 0))
-                .build();
+        assertEquals(promo1, responseEntity.getBody().get(0));
+        assertEquals(promo2, responseEntity.getBody().get(1));
     }
 
     @Test
-    void whenFindAllFixedAmountPromoShouldReturnListOfFixedAmountPromos() {
-        List<FixedAmountPromo> allPromos = List.of(promo);
-
-        when(promoRepository.findAll()).thenReturn(allPromos);
-
-        List<FixedAmountPromo> result = promoService.findAll();
-        verify(promoRepository, atLeastOnce()).findAll();
-        assertEquals(allPromos, result);
+    void testIsNotExpired() {
+        FixedAmountPromo promo = new FixedAmountPromo();
+        promo.setExpirationDate(LocalDateTime.now().plusDays(1));
+        assertTrue(promoService.isNotExpired(promo));
     }
 
     @Test
-    void whenFindByIdAndFoundShouldReturnFixedAmountPromo() {
-        when(promoRepository.findById(any(UUID.class))).thenReturn(Optional.of(promo));
-
-        FixedAmountPromo result = promoService.findById(promo.getId());
-        verify(promoRepository, atLeastOnce()).findById(any(java.util.UUID.class));
-        assertEquals(promo.getId(), result.getId());
-        assertEquals(promo.getName(), result.getName());
-        assertEquals(promo.getDescription(), result.getDescription());
-        assertEquals(promo.getDiscountAmount(), result.getDiscountAmount());
-        assertEquals(promo.getMinimumPurchase(), result.getMinimumPurchase());
-        assertEquals(promo.getExpirationDate(), result.getExpirationDate());
+    void testIsExpired() {
+        FixedAmountPromo promo = new FixedAmountPromo();
+        promo.setExpirationDate(LocalDateTime.now().minusDays(1));
+        assertFalse(promoService.isNotExpired(promo));
     }
 
     @Test
-    void whenFindByIdAndNotFoundShouldReturnEmpty() {
-        when(promoRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
-
-        assertThrows(NoSuchElementException.class, () -> promoService.findById(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")));
+    void testIsNotNegativeMinPurchase() {
+        FixedAmountPromo promo = new FixedAmountPromo();
+        promo.setMinimumPurchase(100L);
+        assertTrue(promoService.isNotNegativeMinPurchase(promo));
     }
 
     @Test
-    void whenCreateFixedAmountPromoShouldReturnTheCreatedFixedAmountPromo() {
-        when(promoRepository.save(any(FixedAmountPromo.class))).thenAnswer(invocation -> {
-            var localPromo = invocation.getArgument(0, FixedAmountPromo.class);
-            localPromo.setId(promo.getId());
-            return localPromo;
-        });
-
-
-        FixedAmountPromo result = promoService.create(createRequest);
-        verify(promoRepository, atLeastOnce()).save(any(FixedAmountPromo.class));
-        assertEquals(promo.getId(), result.getId());
-        assertEquals(promo.getName(), result.getName());
-        assertEquals(promo.getDescription(), result.getDescription());
-        assertEquals(promo.getDiscountAmount(), result.getDiscountAmount());
-        assertEquals(promo.getMinimumPurchase(), result.getMinimumPurchase());
-        assertEquals(promo.getExpirationDate(), result.getExpirationDate());
+    void testIsNegativeMinPurchase() {
+        FixedAmountPromo promo = new FixedAmountPromo();
+        promo.setMinimumPurchase(-50L);
+        assertFalse(promoService.isNotNegativeMinPurchase(promo));
     }
 
     @Test
-    void whenUpdateFixedAmountPromoAndFoundShouldReturnTheUpdatedFixedAmountPromo() {
-        when(promoRepository.findById(any(UUID.class))).thenReturn(Optional.of(promo));
-        when(promoRepository.save(any(FixedAmountPromo.class))).thenAnswer(invocation -> {
-            var localPromo = invocation.getArgument(0, FixedAmountPromo.class);
-            localPromo.setId(updatePromo.getId());
-            return localPromo;
-        });
-
-        FixedAmountPromo result = promoService.update(updatePromo.getId(), updateRequest);
-        verify(promoRepository, atLeastOnce()).save(any(FixedAmountPromo.class));
-        assertEquals(updatePromo.getId(), result.getId());
-        assertEquals(updatePromo.getName(), result.getName());
-        assertEquals(updatePromo.getDescription(), result.getDescription());
-        assertEquals(updatePromo.getDiscountAmount(), result.getDiscountAmount());
-        assertEquals(updatePromo.getMinimumPurchase(), result.getMinimumPurchase());
-        assertEquals(updatePromo.getExpirationDate(), result.getExpirationDate());
+    void testIsNotNegativeDiscount() {
+        FixedAmountPromo promo = new FixedAmountPromo();
+        promo.setDiscountAmount(50L);
+        assertTrue(promoService.isNotNegativeDiscount(promo));
     }
 
     @Test
-    void whenUpdateFixedAmountPromoAndNotFoundShouldThrowException() {
-        when(promoRepository.findById(eq(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")))).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> promoService.update(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551"), createRequest));
+    void testIsNegativeDiscount() {
+        FixedAmountPromo promo = new FixedAmountPromo();
+        promo.setDiscountAmount(-25L);
+        assertFalse(promoService.isNotNegativeDiscount(promo));
     }
 
     @Test
-    void whenDeleteFixedAmountPromoAndFoundShouldCallDeleteByIdOnRepo() {
-        when(promoRepository.findById(any(UUID.class))).thenReturn(Optional.of(promo));
-
-        promoService.delete(promo.getId());
-        verify(promoRepository, atLeastOnce()).delete(any(FixedAmountPromo.class));
+    void testIsValid_ValidPromo() {
+        FixedAmountPromo promo = new FixedAmountPromo();
+        promo.setExpirationDate(LocalDateTime.now().plusDays(1));
+        promo.setMinimumPurchase(100L);
+        promo.setDiscountAmount(10L);
+        assertTrue(promoService.isValid(promo));
     }
 
     @Test
-    void whenDeleteFixedAmountPromoAndNotFoundShouldThrowException() {
-        when(promoRepository.findById(eq(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")))).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> promoService.delete(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")));
+    void testIsValid_ExpiredOnly() {
+        FixedAmountPromo promo = new FixedAmountPromo();
+        promo.setExpirationDate(LocalDateTime.now().minusDays(1));
+        promo.setMinimumPurchase(100L);
+        promo.setDiscountAmount(10L);
+        assertFalse(promoService.isValid(promo));
+    }
+
+    @Test
+    void testIsValid_NegativeMinPurchaseOnly() {
+        FixedAmountPromo promo = new FixedAmountPromo();
+        promo.setExpirationDate(LocalDateTime.now().plusDays(1));
+        promo.setMinimumPurchase(-50L);
+        promo.setDiscountAmount(10L);
+        assertFalse(promoService.isValid(promo));
+    }
+
+    @Test
+    void testIsValid_NegativeDiscountOnly() {
+        FixedAmountPromo promo = new FixedAmountPromo();
+        promo.setExpirationDate(LocalDateTime.now().plusDays(1));
+        promo.setMinimumPurchase(100L);
+        promo.setDiscountAmount(-25L);
+        assertFalse(promoService.isValid(promo));
+    }
+
+    @Test
+    void testIsValid_ExpiredAndNegativeMinPurchase() {
+        FixedAmountPromo promo = new FixedAmountPromo();
+        promo.setExpirationDate(LocalDateTime.now().minusDays(1));
+        promo.setMinimumPurchase(-50L);
+        promo.setDiscountAmount(10L);
+        assertFalse(promoService.isValid(promo));
+    }
+
+    @Test
+    void testIsValid_ExpiredAndNegativeDiscount() {
+        FixedAmountPromo promo = new FixedAmountPromo();
+        promo.setExpirationDate(LocalDateTime.now().minusDays(1));
+        promo.setMinimumPurchase(100L);
+        promo.setDiscountAmount(-25L);
+        assertFalse(promoService.isValid(promo));
+    }
+
+    @Test
+    void testCreate_ValidPromo() {
+        FixedAmountPromoRequest request = new FixedAmountPromoRequest();
+        request.setName("Valid Promo");
+        request.setDescription("This is a valid promo");
+        request.setMinimumPurchase(100L);
+        request.setDiscountAmount(10L);
+        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+
+        FixedAmountPromo promo = new FixedAmountPromo();
+        promo.setName(request.getName());
+        promo.setDescription(request.getDescription());
+        promo.setMinimumPurchase(request.getMinimumPurchase());
+        promo.setDiscountAmount(request.getDiscountAmount());
+        promo.setExpirationDate(request.getExpirationDate());
+
+        when(fixedAmountPromoRepository.save(any())).thenReturn(promo);
+
+        ResponseEntity<PromoResponse> responseEntity = promoService.create(request);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals("Create Fixed Promo Success", responseEntity.getBody().getMessage());
+    }
+
+    @Test
+    void testCreate_InvalidPromo() {
+        FixedAmountPromoRequest request = new FixedAmountPromoRequest();
+        request.setName("Invalid Promo");
+        request.setDescription("This promo is invalid");
+        request.setMinimumPurchase(-50L);
+        request.setDiscountAmount(10L);
+        request.setExpirationDate(LocalDateTime.now().minusDays(1));
+
+        ResponseEntity<PromoResponse> responseEntity = promoService.create(request);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+    }
+
+    @Test
+    void testUpdate_Success() {
+        UUID id = UUID.randomUUID();
+        FixedAmountPromoRequest request = new FixedAmountPromoRequest();
+        request.setName("Updated Promo");
+        request.setDescription("This is an updated promo");
+        request.setMinimumPurchase(100L);
+        request.setDiscountAmount(10L);
+        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+
+        FixedAmountPromo existingPromo = new FixedAmountPromo();
+        existingPromo.setId(id);
+        existingPromo.setName("Existing Promo");
+        existingPromo.setDescription("This is an existing promo");
+        existingPromo.setMinimumPurchase(50L);
+        existingPromo.setDiscountAmount(5L);
+        existingPromo.setExpirationDate(LocalDateTime.now().plusDays(2));
+
+        FixedAmountPromo updatedPromo = new FixedAmountPromo();
+        updatedPromo.setId(id);
+        updatedPromo.setName(request.getName());
+        updatedPromo.setDescription(request.getDescription());
+        updatedPromo.setMinimumPurchase(request.getMinimumPurchase());
+        updatedPromo.setDiscountAmount(request.getDiscountAmount());
+        updatedPromo.setExpirationDate(request.getExpirationDate());
+
+        when(fixedAmountPromoRepository.findById(id)).thenReturn(Optional.of(existingPromo));
+        when(fixedAmountPromoRepository.save(any())).thenReturn(updatedPromo);
+
+        ResponseEntity<PromoResponse> responseEntity = promoService.update(id, request);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals("Fixed Promo updated successfully!", responseEntity.getBody().getMessage());
+    }
+
+    @Test
+    void testUpdate_PromoNotFound() {
+        UUID id = UUID.randomUUID();
+        FixedAmountPromoRequest request = new FixedAmountPromoRequest();
+        request.setName("Updated Promo");
+        request.setDescription("This is an updated promo");
+        request.setMinimumPurchase(100L);
+        request.setDiscountAmount(10L);
+        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+
+        when(fixedAmountPromoRepository.findById(id)).thenReturn(Optional.empty());
+
+        ResponseEntity<PromoResponse> responseEntity = promoService.update(id, request);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals("Fixed Promo not found", responseEntity.getBody().getMessage());
+        assertNull(responseEntity.getBody().getPromo());
+    }
+
+    @Test
+    void testUpdate_PromoFoundButNotValid() {
+        UUID id = UUID.randomUUID();
+        FixedAmountPromoRequest request = new FixedAmountPromoRequest();
+        request.setName("Updated Promo");
+        request.setDescription("This is an updated promo");
+        request.setMinimumPurchase(-50L);
+        request.setDiscountAmount(10L);
+        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+
+        FixedAmountPromo existingPromo = new FixedAmountPromo();
+        existingPromo.setId(id);
+        existingPromo.setName("Existing Promo");
+        existingPromo.setDescription("This is an existing promo");
+        existingPromo.setMinimumPurchase(50L);
+        existingPromo.setDiscountAmount(5L);
+        existingPromo.setExpirationDate(LocalDateTime.now().plusDays(2));
+
+        when(fixedAmountPromoRepository.findById(id)).thenReturn(Optional.of(existingPromo));
+
+        ResponseEntity<PromoResponse> responseEntity = promoService.update(id, request);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals("Fixed Promo update failed! Invalid field(s)!", responseEntity.getBody().getMessage());
     }
 }

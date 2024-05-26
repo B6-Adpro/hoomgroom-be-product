@@ -1,163 +1,320 @@
-package hoomgroom.product.Promo.service;
+package hoomgroom.product.promo.service;
 
-import hoomgroom.product.Promo.dto.PercentagePromoRequest;
-import hoomgroom.product.Promo.model.Factory.PercentagePromoFactory;
-import hoomgroom.product.Promo.model.PercentagePromo;
-import hoomgroom.product.Promo.repository.PercentagePromoRepository;
+import hoomgroom.product.promo.dto.PercentagePromoRequest;
+import hoomgroom.product.promo.dto.PromoResponse;
+import hoomgroom.product.promo.model.PercentagePromo;
+import hoomgroom.product.promo.repository.PercentagePromoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-public class PercentagePromoServiceImplTest {
-    @InjectMocks
-    PercentagePromoServiceImpl promoService;
+class PercentagePromoServiceImplTest {
 
     @Mock
-    PercentagePromoRepository promoRepository;
+    private PercentagePromoRepository percentagePromoRepository;
 
-    PercentagePromoFactory promoFactory = new PercentagePromoFactory();
-
-    PercentagePromo promo;
-    PercentagePromo updatePromo;
-    PercentagePromoRequest createRequest;
-    PercentagePromoRequest updateRequest;
+    @InjectMocks
+    private PercentagePromoServiceImpl promoService;
 
     @BeforeEach
     void setUp() {
-        promo = promoFactory.createPromo();
-        promo.setId(UUID.fromString("dcb2dff0-0cb0-4a79-98ab-8f0ec1bf39f7"));
-        promo.setName("BELANJAHEMAT20");
-        promo.setDescription("Diskon belanja 20%");
-        promo.setPercentage(20.0);
-        promo.setMinimumPurchase(100000L);
-        promo.setExpirationDate(LocalDateTime.of(2024, 6, 5, 0, 0));
-
-        updatePromo = promoFactory.createPromo();
-        updatePromo.setId(UUID.fromString("2a727aac-8788-4242-b609-5752386f929c"));
-        updatePromo.setName("BELANJAHEMAT10");
-        updatePromo.setDescription("Diskon belanja 10%");
-        updatePromo.setPercentage(10.0);
-        updatePromo.setMinimumPurchase(50000L);
-        updatePromo.setExpirationDate(LocalDateTime.of(2024, 6, 4, 0, 0));
-
-        createRequest = PercentagePromoRequest.builder()
-                .name("BELANJAHEMAT20")
-                .description("Diskon belanja 20%")
-                .percentage(20.000)
-                .minimumPurchase(100000L)
-                .expirationDate(LocalDateTime.of(2024, 6, 5, 0, 0))
-                .build();
-
-        updateRequest = PercentagePromoRequest.builder()
-                .name("BELANJAHEMAT10")
-                .description("Diskon belanja 10%")
-                .percentage(10.0)
-                .minimumPurchase(50000L)
-                .expirationDate(LocalDateTime.of(2024, 6, 4, 0, 0))
-                .build();
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void whenFindAllPercentagePromoShouldReturnListOfPercentagePromos() {
-        List<PercentagePromo> allPromos = List.of(promo);
+    void testFindAll() {
+        PercentagePromo promo1 = new PercentagePromo();
+        PercentagePromo promo2 = new PercentagePromo();
+        List<PercentagePromo> promoList = Arrays.asList(promo1, promo2);
 
-        when(promoRepository.findAll()).thenReturn(allPromos);
+        when(percentagePromoRepository.findAll()).thenReturn(promoList);
 
-        List<PercentagePromo> result = promoService.findAll();
-        verify(promoRepository, atLeastOnce()).findAll();
-        assertEquals(allPromos, result);
+        ResponseEntity<List<PercentagePromo>> responseEntity = promoService.findAll();
+
+        assertEquals(promoList, responseEntity.getBody());
     }
 
     @Test
-    void whenFindByIdAndFoundShouldReturnPercentagePromo() {
-        when(promoRepository.findById(any(UUID.class))).thenReturn(Optional.of(promo));
+    void testIsNotExpired() {
+        PercentagePromo promo = new PercentagePromo();
+        promo.setExpirationDate(LocalDateTime.now().plusDays(1));
 
-        PercentagePromo result = promoService.findById(promo.getId());
-        verify(promoRepository, atLeastOnce()).findById(any(java.util.UUID.class));
-        assertEquals(promo.getId(), result.getId());
-        assertEquals(promo.getName(), result.getName());
-        assertEquals(promo.getDescription(), result.getDescription());
-        assertEquals(promo.getPercentage(), result.getPercentage());
-        assertEquals(promo.getMinimumPurchase(), result.getMinimumPurchase());
-        assertEquals(promo.getExpirationDate(), result.getExpirationDate());
+        when(percentagePromoRepository.findById(UUID.randomUUID())).thenReturn(java.util.Optional.of(promo));
+
+        boolean result = promoService.isNotExpired(promo);
+
+        assertTrue(result);
     }
 
     @Test
-    void whenFindByIdAndNotFoundShouldReturnEmpty() {
-        when(promoRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+    void testIsExpired() {
+        PercentagePromo promo = new PercentagePromo();
+        promo.setExpirationDate(LocalDateTime.now().minusDays(1));
 
-        assertThrows(NoSuchElementException.class, () -> promoService.findById(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")));
+        when(percentagePromoRepository.findById(UUID.randomUUID())).thenReturn(java.util.Optional.of(promo));
+
+        boolean result = promoService.isNotExpired(promo);
+
+        assertFalse(result);
     }
 
     @Test
-    void whenCreatePercentagePromoShouldReturnTheCreatedPercentagePromo() {
-        when(promoRepository.save(any(PercentagePromo.class))).thenAnswer(invocation -> {
-            var localPromo = invocation.getArgument(0, PercentagePromo.class);
-            localPromo.setId(promo.getId());
-            return localPromo;
-        });
+    void testIsNotNegativeDiscount() {
+        PercentagePromo promo = new PercentagePromo();
+        promo.setPercentage(10.0);
 
+        boolean result = promoService.isNotNegativeDiscount(promo);
 
-        PercentagePromo result = promoService.create(createRequest);
-        verify(promoRepository, atLeastOnce()).save(any(PercentagePromo.class));
-        assertEquals(promo.getId(), result.getId());
-        assertEquals(promo.getName(), result.getName());
-        assertEquals(promo.getDescription(), result.getDescription());
-        assertEquals(promo.getPercentage(), result.getPercentage());
-        assertEquals(promo.getMinimumPurchase(), result.getMinimumPurchase());
-        assertEquals(promo.getExpirationDate(), result.getExpirationDate());
+        assertTrue(result);
     }
 
     @Test
-    void whenUpdatePercentagePromoAndFoundShouldReturnTheUpdatedPercentagePromo() {
-        when(promoRepository.findById(any(UUID.class))).thenReturn(Optional.of(promo));
-        when(promoRepository.save(any(PercentagePromo.class))).thenAnswer(invocation -> {
-            var localPromo = invocation.getArgument(0, PercentagePromo.class);
-            localPromo.setId(updatePromo.getId());
-            return localPromo;
-        });
+    void testIsNegativeDiscount() {
+        PercentagePromo promo = new PercentagePromo();
+        promo.setPercentage(-10.0);
 
-        PercentagePromo result = promoService.update(updatePromo.getId(), updateRequest);
-        verify(promoRepository, atLeastOnce()).save(any(PercentagePromo.class));
-        assertEquals(updatePromo.getId(), result.getId());
-        assertEquals(updatePromo.getName(), result.getName());
-        assertEquals(updatePromo.getDescription(), result.getDescription());
-        assertEquals(updatePromo.getPercentage(), result.getPercentage());
-        assertEquals(updatePromo.getMinimumPurchase(), result.getMinimumPurchase());
-        assertEquals(updatePromo.getExpirationDate(), result.getExpirationDate());
+        boolean result = promoService.isNotNegativeDiscount(promo);
+
+        assertFalse(result);
     }
 
     @Test
-    void whenUpdatePercentagePromoAndNotFoundShouldThrowException() {
-        when(promoRepository.findById(eq(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")))).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> promoService.update(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551"), createRequest));
+    void testIsNotNegativeMinPurchase() {
+        PercentagePromo promo = new PercentagePromo();
+        promo.setMinimumPurchase(100L);
+
+        boolean result = promoService.isNotNegativeMinPurchase(promo);
+
+        assertTrue(result);
     }
 
     @Test
-    void whenDeletePercentagePromoAndFoundShouldCallDeleteByIdOnRepo() {
-        when(promoRepository.findById(any(UUID.class))).thenReturn(Optional.of(promo));
+    void testIsNegativeMinPurchase() {
+        PercentagePromo promo = new PercentagePromo();
+        promo.setMinimumPurchase(-50L);
 
-        promoService.delete(promo.getId());
-        verify(promoRepository, atLeastOnce()).delete(any(PercentagePromo.class));
+        boolean result = promoService.isNotNegativeMinPurchase(promo);
+
+        assertFalse(result);
     }
 
     @Test
-    void whenDeletePercentagePromoAndNotFoundShouldThrowException() {
-        when(promoRepository.findById(eq(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")))).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> promoService.delete(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")));
+    void testIsValidPromo() {
+        PercentagePromo promo = new PercentagePromo();
+        promo.setExpirationDate(LocalDateTime.now().plusDays(1));
+        promo.setMinimumPurchase(100L);
+        promo.setPercentage(10.0);
+
+        boolean result = promoService.isValid(promo);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void testIsInvalidPromo_Expired() {
+        PercentagePromo promo = new PercentagePromo();
+        promo.setExpirationDate(LocalDateTime.now().minusDays(1));
+        promo.setMinimumPurchase(100L);
+        promo.setPercentage(10.0);
+
+        boolean result = promoService.isValid(promo);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testIsInvalidPromo_NegativeMinPurchase() {
+        PercentagePromo promo = new PercentagePromo();
+        promo.setExpirationDate(LocalDateTime.now().plusDays(1));
+        promo.setMinimumPurchase(-100L);
+        promo.setPercentage(10.0);
+
+        boolean result = promoService.isValid(promo);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testIsInvalidPromo_NegativeDiscount() {
+        PercentagePromo promo = new PercentagePromo();
+        promo.setExpirationDate(LocalDateTime.now().plusDays(1));
+        promo.setMinimumPurchase(100L);
+        promo.setPercentage(-10.0);
+
+        boolean result = promoService.isValid(promo);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testIsInvalidPromo_ExpiredAndNegativeMinPurchase() {
+        PercentagePromo promo = new PercentagePromo();
+        promo.setExpirationDate(LocalDateTime.now().minusDays(1));
+        promo.setMinimumPurchase(-100L);
+        promo.setPercentage(10.0);
+
+        boolean result = promoService.isValid(promo);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testIsInvalidPromo_ExpiredAndNegativeDiscount() {
+        PercentagePromo promo = new PercentagePromo();
+        promo.setExpirationDate(LocalDateTime.now().minusDays(1));
+        promo.setMinimumPurchase(100L);
+        promo.setPercentage(-10.0);
+
+        boolean result = promoService.isValid(promo);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testCreateValidPromo() {
+        PercentagePromoRequest request = new PercentagePromoRequest();
+        request.setName("Valid Promo");
+        request.setDescription("This is a valid promo");
+        request.setMinimumPurchase(100L);
+        request.setPercentage(10.0);
+        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+
+        ResponseEntity<PromoResponse> responseEntity = promoService.create(request);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+    }
+
+    @Test
+    void testCreateInvalidPromo_NegativeDiscount() {
+        PercentagePromoRequest request = new PercentagePromoRequest();
+        request.setName("Invalid Promo");
+        request.setDescription("This promo has a negative discount");
+        request.setMinimumPurchase(100L);
+        request.setPercentage(-10.0);
+        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+
+        ResponseEntity<PromoResponse> responseEntity = promoService.create(request);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+    }
+
+    @Test
+    void testUpdate_PromoFoundButNotValid() {
+        UUID id = UUID.randomUUID();
+        PercentagePromoRequest request = new PercentagePromoRequest();
+        request.setName("Updated Promo");
+        request.setDescription("This is an updated promo");
+        request.setMinimumPurchase(-50L);
+        request.setPercentage(20.0);
+        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+
+        PercentagePromo existingPromo = new PercentagePromo();
+        existingPromo.setId(id);
+        existingPromo.setName("Existing Promo");
+        existingPromo.setDescription("This is an existing promo");
+        existingPromo.setMinimumPurchase(50L);
+        existingPromo.setPercentage(10.0);
+        existingPromo.setExpirationDate(LocalDateTime.now().plusDays(2));
+
+        when(percentagePromoRepository.findById(id)).thenReturn(Optional.of(existingPromo));
+
+        ResponseEntity<PromoResponse> responseEntity = promoService.update(id, request);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals("Percent Promo update failed! Invalid field(s)!", responseEntity.getBody().getMessage());
+    }
+
+    @Test
+    void testUpdate_Success() {
+        UUID id = UUID.randomUUID();
+        PercentagePromoRequest request = new PercentagePromoRequest();
+        request.setName("Updated Promo");
+        request.setDescription("This is an updated promo");
+        request.setMinimumPurchase(100L);
+        request.setPercentage(20.0);
+        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+
+        PercentagePromo existingPromo = new PercentagePromo();
+        existingPromo.setId(id);
+        existingPromo.setName("Existing Promo");
+        existingPromo.setDescription("This is an existing promo");
+        existingPromo.setMinimumPurchase(50L);
+        existingPromo.setPercentage(10.0);
+        existingPromo.setExpirationDate(LocalDateTime.now().plusDays(2));
+
+        PercentagePromo updatedPromo = new PercentagePromo();
+        updatedPromo.setId(id);
+        updatedPromo.setName(request.getName());
+        updatedPromo.setDescription(request.getDescription());
+        updatedPromo.setMinimumPurchase(request.getMinimumPurchase());
+        updatedPromo.setPercentage(request.getPercentage());
+        updatedPromo.setExpirationDate(request.getExpirationDate());
+
+        when(percentagePromoRepository.findById(id)).thenReturn(Optional.of(existingPromo));
+        when(percentagePromoRepository.save(any())).thenReturn(updatedPromo);
+
+        ResponseEntity<PromoResponse> responseEntity = promoService.update(id, request);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals("Percent Promo updated successfully!", responseEntity.getBody().getMessage());
+    }
+
+    @Test
+    void testUpdate_PromoNotFound() {
+        UUID id = UUID.randomUUID();
+        PercentagePromoRequest request = new PercentagePromoRequest();
+        request.setName("Updated Promo");
+        request.setDescription("This is an updated promo");
+        request.setMinimumPurchase(100L);
+        request.setPercentage(20.0);
+        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+
+        when(percentagePromoRepository.findById(id)).thenReturn(Optional.empty());
+
+        ResponseEntity<PromoResponse> responseEntity = promoService.update(id, request);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals("Percent Promo not found", responseEntity.getBody().getMessage());
+        assertNull(responseEntity.getBody().getPromo());
+    }
+
+    @Test
+    void testUpdate_PromoFoundButNotValidMinimum() {
+        UUID id = UUID.randomUUID();
+        PercentagePromoRequest request = new PercentagePromoRequest();
+        request.setName("Updated Promo");
+        request.setDescription("This is an updated promo");
+        request.setMinimumPurchase(-50L);
+        request.setPercentage(20.0);
+        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+
+        PercentagePromo existingPromo = new PercentagePromo();
+        existingPromo.setId(id);
+        existingPromo.setName("Existing Promo");
+        existingPromo.setDescription("This is an existing promo");
+        existingPromo.setMinimumPurchase(50L);
+        existingPromo.setPercentage(10.0);
+        existingPromo.setExpirationDate(LocalDateTime.now().plusDays(2));
+
+        when(percentagePromoRepository.findById(id)).thenReturn(Optional.of(existingPromo));
+
+        ResponseEntity<PromoResponse> responseEntity = promoService.update(id, request);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals("Percent Promo update failed! Invalid field(s)!", responseEntity.getBody().getMessage());
     }
 }

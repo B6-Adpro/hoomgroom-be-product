@@ -62,7 +62,7 @@ public class PromoServiceImpl implements PromoService {
     }
 
     public boolean isValid (Promo promo) {
-        return promo.getExpirationDate().isBefore(LocalDateTime.now());
+        return promo.getExpirationDate().isAfter(LocalDateTime.now());
     }
 
     public ResponseEntity<RedeemResponse> redeem(UUID transactionId, UUID promoId, Long totalPrice) {
@@ -85,7 +85,7 @@ public class PromoServiceImpl implements PromoService {
                     .discountPrice(totalPrice)
                     .build();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        } else if (promo.get().getMinimumPurchase() < totalPrice) {
+        } else if (promo.get().getMinimumPurchase() > totalPrice) {
             RedeemResponse response = RedeemResponse.builder()
                     .message("Minimum Purchase not enough!")
                     .transactionId(transactionId)

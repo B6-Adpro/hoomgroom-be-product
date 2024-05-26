@@ -4,6 +4,8 @@ import hoomgroom.product.promo.model.factory.FixedAmountPromoFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,6 +23,7 @@ class FixedAmountPromoTest {
         this.promo.setDescription("Promo ini mengurangi harga sebesar 20 persen");
         this.promo.setMinimumPurchase(50000L);
         this.promo.setDiscountAmount(20000L);
+        this.promo.setExpirationDate(LocalDateTime.now().plusHours(1));
     }
 
     @Test
@@ -46,5 +49,27 @@ class FixedAmountPromoTest {
     @Test
     void testGetFixedAmountPromoAmount() {
         assertEquals(20000L, this.promo.getDiscountAmount());
+    }
+
+    @Test
+    void testGetPercentAmountExpirationDate() {
+        assertEquals(LocalDateTime.now().plusHours(1).withNano(0),
+                this.promo.getExpirationDate().withNano(0));}
+
+    @Test
+    void testApplyPromo() {
+        long totalPrice = 60000L;
+        long expectedDiscountedPrice = 40000L;
+        long actualDiscountedPrice = promo.applyPromo(totalPrice);
+
+        assertEquals(expectedDiscountedPrice, actualDiscountedPrice);
+    }
+
+    @Test
+    void testApplyPromoInvalid() {
+        long totalPrice = 30000L;
+        long actualDiscountedPrice = promo.applyPromo(totalPrice);
+
+        assertEquals(0, actualDiscountedPrice);
     }
 }
