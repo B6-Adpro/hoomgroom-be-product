@@ -1,4 +1,4 @@
-package hoomgroom.product.Promo.dto;
+package hoomgroom.product.promo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
