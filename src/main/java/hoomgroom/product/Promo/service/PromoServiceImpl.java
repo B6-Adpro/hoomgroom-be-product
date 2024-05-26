@@ -85,6 +85,15 @@ public class PromoServiceImpl implements PromoService {
                     .discountPrice(totalPrice)
                     .build();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } else if (promo.get().getMinimumPurchase() < totalPrice) {
+            RedeemResponse response = RedeemResponse.builder()
+                    .message("Minimum Purchase not enough!")
+                    .transactionId(transactionId)
+                    .promoId(promoId)
+                    .normalPrice(totalPrice)
+                    .discountPrice(totalPrice)
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         Long discountPrice =  promo.get().applyPromo(totalPrice);
