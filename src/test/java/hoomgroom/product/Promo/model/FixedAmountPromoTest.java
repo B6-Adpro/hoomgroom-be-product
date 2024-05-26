@@ -1,6 +1,5 @@
-package hoomgroom.product.Promo.model;
+package hoomgroom.product.promo.model;
 
-import hoomgroom.product.Promo.model.Factory.FixedAmountPromoFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,14 +7,12 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FixedAmountPromoTest {
+class FixedAmountPromoTest {
     FixedAmountPromo promo;
-
-    FixedAmountPromoFactory factory = new FixedAmountPromoFactory();
 
     @BeforeEach
     void setUp(){
-        this.promo = factory.createPromo();
+        this.promo = new FixedAmountPromo();
         this.promo.setId(UUID.fromString("898e0bf5-9fa3-4815-92a5-0e9c422f9c3a"));
         this.promo.setName("BELANJAHEMAT20FIXED");
         this.promo.setDescription("Promo ini mengurangi harga sebesar 20 persen");

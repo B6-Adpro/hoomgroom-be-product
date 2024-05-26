@@ -1,6 +1,6 @@
-package hoomgroom.product.Promo.model.Factory;
+package hoomgroom.product.promo.model.factory;
 
-import hoomgroom.product.Promo.model.PercentagePromo;
+import hoomgroom.product.promo.model.PercentagePromo;
 
 public class PercentagePromoFactory extends PromoFactory {
     @Override

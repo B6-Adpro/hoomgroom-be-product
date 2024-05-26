@@ -1,6 +1,6 @@
-package hoomgroom.product.Promo.repository;
+package hoomgroom.product.promo.repository;
 
-import hoomgroom.product.Promo.model.PercentagePromo;
+import hoomgroom.product.promo.model.PercentagePromo;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
