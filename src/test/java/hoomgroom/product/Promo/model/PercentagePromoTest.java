@@ -1,6 +1,6 @@
-package hoomgroom.product.Promo.model;
+package hoomgroom.product.promo.model;
 
-import hoomgroom.product.Promo.model.Factory.PercentagePromoFactory;
+import hoomgroom.product.promo.model.factory.PercentagePromoFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PercentagePromoTest {
+class PercentagePromoTest {
     PercentagePromo promo;
 
     PercentagePromoFactory factory = new PercentagePromoFactory();
