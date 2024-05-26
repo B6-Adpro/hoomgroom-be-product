@@ -1,4 +1,4 @@
-package hoomgroom.product.Promo.model;
+package hoomgroom.product.promo.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,4 +13,9 @@ import lombok.Setter;
 public class PercentagePromo extends Promo {
     @Column(name = "percentage")
     Double percentage;
+
+    @Override
+    public Long applyPromo(Long totalPrice) {
+        return (long) (totalPrice * (1 - percentage));
+    }
 }
