@@ -1,8 +1,8 @@
-package hoomgroom.product.Promo.repository;
+package hoomgroom.product.promo.repository;
 
-import hoomgroom.product.Promo.model.Factory.PercentagePromoFactory;
-import hoomgroom.product.Promo.model.PercentagePromo;
-import hoomgroom.product.Promo.model.Promo;
+import hoomgroom.product.promo.model.factory.PercentagePromoFactory;
+import hoomgroom.product.promo.model.PercentagePromo;
+import hoomgroom.product.promo.model.Promo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class PromoRepositoryTest {
+class PromoRepositoryTest {
     @Autowired
     PromoRepository promoRepository;
 
@@ -54,7 +54,7 @@ public class PromoRepositoryTest {
     }
 
     @Test
-    public void testSaveCreate() {
+    void testSaveCreate() {
         PercentagePromo promo = promos.get(2);
         promoRepository.save(promo);
         Optional<Promo> findResult = promoRepository.findById(promo.getId());
@@ -68,7 +68,7 @@ public class PromoRepositoryTest {
     }
 
     @Test
-    public void testSaveUpdate() {
+    void testSaveUpdate() {
         PercentagePromo promo = promos.get(0);
         promoRepository.save(promo);
 
@@ -90,7 +90,7 @@ public class PromoRepositoryTest {
     }
 
     @Test
-    public void testFindByIdIfIdFound() {
+    void testFindByIdIfIdFound() {
         promoRepository.saveAll(promos);
 
         PercentagePromo target = promos.get(0);
@@ -104,7 +104,7 @@ public class PromoRepositoryTest {
     }
 
     @Test
-    public void testFindByIdIfIdNotFound() {
+    void testFindByIdIfIdNotFound() {
         promoRepository.saveAll(promos);
 
         Optional<Promo> findResult = promoRepository.findById(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));

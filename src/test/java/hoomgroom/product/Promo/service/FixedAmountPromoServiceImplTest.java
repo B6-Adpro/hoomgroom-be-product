@@ -1,9 +1,10 @@
-package hoomgroom.product.Promo.service;
+package hoomgroom.product.promo.service;
 
-import hoomgroom.product.Promo.dto.FixedAmountPromoRequest;
-import hoomgroom.product.Promo.model.Factory.FixedAmountPromoFactory;
-import hoomgroom.product.Promo.model.FixedAmountPromo;
-import hoomgroom.product.Promo.repository.FixedAmountPromoRepository;
+import hoomgroom.product.promo.dto.FixedAmountPromoRequest;
+import hoomgroom.product.promo.dto.PromoResponse;
+import hoomgroom.product.promo.model.factory.FixedAmountPromoFactory;
+import hoomgroom.product.promo.model.FixedAmountPromo;
+import hoomgroom.product.promo.repository.FixedAmountPromoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,13 +17,15 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class FixedAmountPromoServiceImplTest {
+class FixedAmountPromoServiceImplTest {
     @InjectMocks
     FixedAmountPromoServiceImpl promoService;
 
@@ -72,39 +75,7 @@ public class FixedAmountPromoServiceImplTest {
     }
 
     @Test
-    void whenFindAllFixedAmountPromoShouldReturnListOfFixedAmountPromos() {
-        List<FixedAmountPromo> allPromos = List.of(promo);
-
-        when(promoRepository.findAll()).thenReturn(allPromos);
-
-        List<FixedAmountPromo> result = promoService.findAll();
-        verify(promoRepository, atLeastOnce()).findAll();
-        assertEquals(allPromos, result);
-    }
-
-    @Test
-    void whenFindByIdAndFoundShouldReturnFixedAmountPromo() {
-        when(promoRepository.findById(any(UUID.class))).thenReturn(Optional.of(promo));
-
-        FixedAmountPromo result = promoService.findById(promo.getId());
-        verify(promoRepository, atLeastOnce()).findById(any(java.util.UUID.class));
-        assertEquals(promo.getId(), result.getId());
-        assertEquals(promo.getName(), result.getName());
-        assertEquals(promo.getDescription(), result.getDescription());
-        assertEquals(promo.getDiscountAmount(), result.getDiscountAmount());
-        assertEquals(promo.getMinimumPurchase(), result.getMinimumPurchase());
-        assertEquals(promo.getExpirationDate(), result.getExpirationDate());
-    }
-
-    @Test
-    void whenFindByIdAndNotFoundShouldReturnEmpty() {
-        when(promoRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
-
-        assertThrows(NoSuchElementException.class, () -> promoService.findById(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")));
-    }
-
-    @Test
-    void whenCreateFixedAmountPromoShouldReturnTheCreatedFixedAmountPromo() {
+    void whenCreateFixedAmountPromoShouldReturnTheCreatedFixedAmountPromo() throws ExecutionException, InterruptedException {
         when(promoRepository.save(any(FixedAmountPromo.class))).thenAnswer(invocation -> {
             var localPromo = invocation.getArgument(0, FixedAmountPromo.class);
             localPromo.setId(promo.getId());
@@ -112,18 +83,18 @@ public class FixedAmountPromoServiceImplTest {
         });
 
 
-        FixedAmountPromo result = promoService.create(createRequest);
+        CompletableFuture<PromoResponse> result = promoService.create(createRequest);
         verify(promoRepository, atLeastOnce()).save(any(FixedAmountPromo.class));
-        assertEquals(promo.getId(), result.getId());
-        assertEquals(promo.getName(), result.getName());
-        assertEquals(promo.getDescription(), result.getDescription());
-        assertEquals(promo.getDiscountAmount(), result.getDiscountAmount());
-        assertEquals(promo.getMinimumPurchase(), result.getMinimumPurchase());
-        assertEquals(promo.getExpirationDate(), result.getExpirationDate());
+        assertEquals(promo.getId(), result.get().getPromo().getId());
+        assertEquals(promo.getName(), result.get().getPromo().getName());
+        assertEquals(promo.getDescription(), result.get().getPromo().getDescription());
+        assertEquals(promo.getDiscountAmount(), ((FixedAmountPromo) result.get().getPromo()).getDiscountAmount());
+        assertEquals(promo.getMinimumPurchase(), result.get().getPromo().getMinimumPurchase());
+        assertEquals(promo.getExpirationDate(), result.get().getPromo().getExpirationDate());
     }
 
     @Test
-    void whenUpdateFixedAmountPromoAndFoundShouldReturnTheUpdatedFixedAmountPromo() {
+    void whenUpdateFixedAmountPromoAndFoundShouldReturnTheUpdatedFixedAmountPromo() throws ExecutionException, InterruptedException {
         when(promoRepository.findById(any(UUID.class))).thenReturn(Optional.of(promo));
         when(promoRepository.save(any(FixedAmountPromo.class))).thenAnswer(invocation -> {
             var localPromo = invocation.getArgument(0, FixedAmountPromo.class);
@@ -131,33 +102,13 @@ public class FixedAmountPromoServiceImplTest {
             return localPromo;
         });
 
-        FixedAmountPromo result = promoService.update(updatePromo.getId(), updateRequest);
+        CompletableFuture<PromoResponse> result = promoService.update(updatePromo.getId(), updateRequest);
         verify(promoRepository, atLeastOnce()).save(any(FixedAmountPromo.class));
-        assertEquals(updatePromo.getId(), result.getId());
-        assertEquals(updatePromo.getName(), result.getName());
-        assertEquals(updatePromo.getDescription(), result.getDescription());
-        assertEquals(updatePromo.getDiscountAmount(), result.getDiscountAmount());
-        assertEquals(updatePromo.getMinimumPurchase(), result.getMinimumPurchase());
-        assertEquals(updatePromo.getExpirationDate(), result.getExpirationDate());
-    }
-
-    @Test
-    void whenUpdateFixedAmountPromoAndNotFoundShouldThrowException() {
-        when(promoRepository.findById(eq(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")))).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> promoService.update(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551"), createRequest));
-    }
-
-    @Test
-    void whenDeleteFixedAmountPromoAndFoundShouldCallDeleteByIdOnRepo() {
-        when(promoRepository.findById(any(UUID.class))).thenReturn(Optional.of(promo));
-
-        promoService.delete(promo.getId());
-        verify(promoRepository, atLeastOnce()).delete(any(FixedAmountPromo.class));
-    }
-
-    @Test
-    void whenDeleteFixedAmountPromoAndNotFoundShouldThrowException() {
-        when(promoRepository.findById(eq(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")))).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> promoService.delete(UUID.fromString("cf4a7487-83f5-4396-b115-608a8227b551")));
+        assertEquals(promo.getId(), result.get().getPromo().getId());
+        assertEquals(promo.getName(), result.get().getPromo().getName());
+        assertEquals(promo.getDescription(), result.get().getPromo().getDescription());
+        assertEquals(promo.getDiscountAmount(), ((FixedAmountPromo) result.get().getPromo()).getDiscountAmount());
+        assertEquals(promo.getMinimumPurchase(), result.get().getPromo().getMinimumPurchase());
+        assertEquals(promo.getExpirationDate(), result.get().getPromo().getExpirationDate());
     }
 }

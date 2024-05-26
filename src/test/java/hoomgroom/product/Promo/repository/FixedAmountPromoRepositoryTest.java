@@ -1,7 +1,7 @@
-package hoomgroom.product.Promo.repository;
+package hoomgroom.product.promo.repository;
 
-import hoomgroom.product.Promo.model.Factory.FixedAmountPromoFactory;
-import hoomgroom.product.Promo.model.FixedAmountPromo;
+import hoomgroom.product.promo.model.factory.FixedAmountPromoFactory;
+import hoomgroom.product.promo.model.FixedAmountPromo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class FixedAmountPromoRepositoryTest {
+class FixedAmountPromoRepositoryTest {
     @Autowired
     FixedAmountPromoRepository promoRepository;
 
@@ -53,7 +53,7 @@ public class FixedAmountPromoRepositoryTest {
     }
 
     @Test
-    public void testSaveCreate() {
+    void testSaveCreate() {
         FixedAmountPromo promo = promos.get(2);
         promoRepository.save(promo);
         Optional<FixedAmountPromo> findResult = promoRepository.findById(promo.getId());
@@ -68,7 +68,7 @@ public class FixedAmountPromoRepositoryTest {
     }
 
     @Test
-    public void testSaveUpdate() {
+    void testSaveUpdate() {
         FixedAmountPromo promo = promos.get(0);
         promoRepository.save(promo);
 
@@ -91,7 +91,7 @@ public class FixedAmountPromoRepositoryTest {
     }
 
     @Test
-    public void testFindByIdIfIdFound() {
+    void testFindByIdIfIdFound() {
         promoRepository.saveAll(promos);
 
         FixedAmountPromo target = promos.get(0);
@@ -106,7 +106,7 @@ public class FixedAmountPromoRepositoryTest {
     }
 
     @Test
-    public void testFindByIdIfIdNotFound() {
+    void testFindByIdIfIdNotFound() {
         promoRepository.saveAll(promos);
 
         Optional<FixedAmountPromo> findResult = promoRepository.findById(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
@@ -114,7 +114,7 @@ public class FixedAmountPromoRepositoryTest {
     }
 
     @Test
-    public void testFindByNameFound() {
+    void testFindByNameFound() {
         promoRepository.saveAll(promos);
 
         FixedAmountPromo target = promos.get(0);
@@ -130,7 +130,7 @@ public class FixedAmountPromoRepositoryTest {
     }
 
     @Test
-    public void testFindByNameNotFound() {
+    void testFindByNameNotFound() {
         promoRepository.saveAll(promos);
 
         List<FixedAmountPromo> findResult = promoRepository.findByName("name_not_found");
@@ -138,7 +138,7 @@ public class FixedAmountPromoRepositoryTest {
     }
 
     @Test
-    public void testFindByExpirationDateBeforeFound() {
+    void testFindByExpirationDateBeforeFound() {
         promoRepository.saveAll(promos);
 
         FixedAmountPromo target = promos.get(2);
@@ -155,7 +155,7 @@ public class FixedAmountPromoRepositoryTest {
     }
 
     @Test
-    public void testFindByExpirationDateBeforeNotFound() {
+    void testFindByExpirationDateBeforeNotFound() {
         promoRepository.saveAll(promos);
 
         List<FixedAmountPromo> findResult = promoRepository.findByExpirationDateBefore(
@@ -164,7 +164,7 @@ public class FixedAmountPromoRepositoryTest {
     }
 
     @Test
-    public void testFindByDiscountAmountFound() {
+    void testFindByDiscountAmountFound() {
         promoRepository.saveAll(promos);
 
         FixedAmountPromo target = promos.get(2);
@@ -180,7 +180,7 @@ public class FixedAmountPromoRepositoryTest {
     }
 
     @Test
-    public void testFindByDiscountAmountNotFound() {
+    void testFindByDiscountAmountNotFound() {
         promoRepository.saveAll(promos);
 
         List<FixedAmountPromo> findResult = promoRepository

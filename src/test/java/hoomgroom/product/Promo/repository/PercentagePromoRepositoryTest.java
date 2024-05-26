@@ -1,7 +1,7 @@
-package hoomgroom.product.Promo.repository;
+package hoomgroom.product.promo.repository;
 
-import hoomgroom.product.Promo.model.Factory.PercentagePromoFactory;
-import hoomgroom.product.Promo.model.PercentagePromo;
+import hoomgroom.product.promo.model.factory.PercentagePromoFactory;
+import hoomgroom.product.promo.model.PercentagePromo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class PercentagePromoRepositoryTest {
+class PercentagePromoRepositoryTest {
     @Autowired
     PercentagePromoRepository promoRepository;
 
@@ -53,7 +53,7 @@ public class PercentagePromoRepositoryTest {
     }
 
     @Test
-    public void testSaveCreate() {
+    void testSaveCreate() {
         PercentagePromo promo = promos.get(2);
         promoRepository.save(promo);
         Optional<PercentagePromo> findResult = promoRepository.findById(promo.getId());
@@ -68,7 +68,7 @@ public class PercentagePromoRepositoryTest {
     }
 
     @Test
-    public void testSaveUpdate() {
+    void testSaveUpdate() {
         PercentagePromo promo = promos.get(0);
         promoRepository.save(promo);
 
@@ -91,7 +91,7 @@ public class PercentagePromoRepositoryTest {
     }
 
     @Test
-    public void testFindByIdIfIdFound() {
+    void testFindByIdIfIdFound() {
         promoRepository.saveAll(promos);
 
         PercentagePromo target = promos.get(0);
@@ -106,7 +106,7 @@ public class PercentagePromoRepositoryTest {
     }
 
     @Test
-    public void testFindByIdIfIdNotFound() {
+    void testFindByIdIfIdNotFound() {
         promoRepository.saveAll(promos);
 
         Optional<PercentagePromo> findResult = promoRepository.findById(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
@@ -114,7 +114,7 @@ public class PercentagePromoRepositoryTest {
     }
 
     @Test
-    public void testFindByNameFound() {
+    void testFindByNameFound() {
         promoRepository.saveAll(promos);
 
         PercentagePromo target = promos.get(0);
@@ -130,7 +130,7 @@ public class PercentagePromoRepositoryTest {
     }
 
     @Test
-    public void testFindByNameNotFound() {
+    void testFindByNameNotFound() {
         promoRepository.saveAll(promos);
 
         List<PercentagePromo> findResult = promoRepository.findByName("name_not_found");
@@ -138,7 +138,7 @@ public class PercentagePromoRepositoryTest {
     }
 
     @Test
-    public void testFindByExpirationDateBeforeFound() {
+    void testFindByExpirationDateBeforeFound() {
         promoRepository.saveAll(promos);
 
         PercentagePromo target = promos.get(2);
@@ -155,7 +155,7 @@ public class PercentagePromoRepositoryTest {
     }
 
     @Test
-    public void testFindByExpirationDateBeforeNotFound() {
+    void testFindByExpirationDateBeforeNotFound() {
         promoRepository.saveAll(promos);
 
         List<PercentagePromo> findResult = promoRepository.findByExpirationDateBefore(
@@ -164,7 +164,7 @@ public class PercentagePromoRepositoryTest {
     }
 
     @Test
-    public void testFindByPercentageFound() {
+    void testFindByPercentageFound() {
         promoRepository.saveAll(promos);
 
         PercentagePromo target = promos.get(2);
@@ -180,7 +180,7 @@ public class PercentagePromoRepositoryTest {
     }
 
     @Test
-    public void testFindByPercentageNotFound() {
+    void testFindByPercentageNotFound() {
         promoRepository.saveAll(promos);
 
         List<PercentagePromo> findResult = promoRepository
