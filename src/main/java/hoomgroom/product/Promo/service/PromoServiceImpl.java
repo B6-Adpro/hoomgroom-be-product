@@ -22,8 +22,8 @@ public class PromoServiceImpl implements PromoService {
     private static final String PROMO_NOT_FOUND_MESSAGE = "Promo id %s not found!";
     private final PromoRepository promoRepository;
 
-    public List<Promo> findAll() {
-        return promoRepository.findAll();
+    public ResponseEntity<List<Promo>> findAll() {
+        return ResponseEntity.ok(promoRepository.findAll());
     }
 
     public ResponseEntity<PromoResponse> findById(@NonNull UUID id){

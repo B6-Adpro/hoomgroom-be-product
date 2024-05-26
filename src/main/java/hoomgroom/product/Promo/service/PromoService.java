@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public interface PromoService {
-    List<Promo> findAll();
+    ResponseEntity<List<Promo>> findAll();
     ResponseEntity<PromoResponse> findById(UUID uuid);
     ResponseEntity<Response> delete(UUID uuid) throws ExecutionException, InterruptedException;
     ResponseEntity<RedeemResponse> redeem(UUID transactionId, UUID promoId, Long totalPrice);
