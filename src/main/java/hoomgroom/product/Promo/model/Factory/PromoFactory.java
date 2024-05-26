@@ -1,6 +1,6 @@
-package hoomgroom.product.Promo.model.Factory;
+package hoomgroom.product.promo.model.factory;
 
-import hoomgroom.product.Promo.model.Promo;
+import hoomgroom.product.promo.model.Promo;
 
 public abstract class PromoFactory {
     public abstract Promo createPromo();
