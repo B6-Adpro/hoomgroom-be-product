@@ -1,15 +1,18 @@
-package hoomgroom.product.Promo.service;
+package hoomgroom.product.promo.service;
 
-import hoomgroom.product.Promo.dto.PercentagePromoRequest;
-import hoomgroom.product.Promo.model.Factory.PercentagePromoFactory;
-import hoomgroom.product.Promo.model.PercentagePromo;
-import hoomgroom.product.Promo.repository.PercentagePromoRepository;
-import lombok.NonNull;
+import hoomgroom.product.promo.dto.PercentagePromoRequest;
+import hoomgroom.product.promo.dto.PromoResponse;
+import hoomgroom.product.promo.model.PercentagePromo;
+import hoomgroom.product.promo.model.factory.PercentagePromoFactory;
+import hoomgroom.product.promo.repository.PercentagePromoRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,21 +22,12 @@ public class PercentagePromoServiceImpl implements PercentagePromoService{
     private final PercentagePromoRepository percentagePromoRepository;
 
     @Override
-    public List<PercentagePromo> findAll() {
-        return percentagePromoRepository.findAll();
+    public ResponseEntity<List<PercentagePromo>> findAll() {
+        return ResponseEntity.ok(percentagePromoRepository.findAll());
     }
 
     @Override
-    public PercentagePromo findById(@NonNull UUID id) throws NoSuchElementException {
-        Optional<PercentagePromo> promo = percentagePromoRepository.findById(id);
-        if (promo.isEmpty()){
-            throw new NoSuchElementException();
-        }
-        return promo.get();
-    }
-
-    @Override
-    public PercentagePromo create(PercentagePromoRequest request) {
+    public ResponseEntity<PromoResponse> create(PercentagePromoRequest request) {
         PercentagePromoFactory promoFactory = new PercentagePromoFactory();
         PercentagePromo promo = promoFactory.createPromo();
         promo.setName(request.getName());
@@ -42,33 +36,101 @@ public class PercentagePromoServiceImpl implements PercentagePromoService{
         promo.setPercentage(request.getPercentage());
         promo.setExpirationDate(request.getExpirationDate());
         percentagePromoRepository.save(promo);
-        return promo;
+
+        if (isValid(promo)) {
+            try {
+                percentagePromoRepository.save(promo);
+            } catch (ConstraintViolationException e) {
+                PromoResponse response = PromoResponse
+                        .builder()
+                        .message("Percent Promo name can't be empty!")
+                        .promo(promo)
+                        .build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+            PromoResponse response = PromoResponse
+                    .builder()
+                    .message("Percent Fixed Promo Success")
+                    .promo(promo)
+                    .build();
+            return ResponseEntity.ok(response);
+        }
+
+        PromoResponse response = PromoResponse
+                .builder()
+                .message("Create Percent Promo Failed! Invalid field(s)")
+                .promo(promo)
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @Override
-    public PercentagePromo update(UUID id, PercentagePromoRequest request) {
+    public ResponseEntity<PromoResponse> update(UUID id, PercentagePromoRequest request) {
         Optional<PercentagePromo> promo = percentagePromoRepository.findById(id);
 
         if (promo.isEmpty()) {
-            throw new NoSuchElementException();
+            PromoResponse response = PromoResponse.builder()
+                    .message("Percent Promo not found")
+                    .build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
-        promo.get().setName(request.getName());
-        promo.get().setDescription(request.getDescription());
-        promo.get().setMinimumPurchase(request.getMinimumPurchase());
-        promo.get().setPercentage(request.getPercentage());
-        promo.get().setExpirationDate(request.getExpirationDate());
-        return percentagePromoRepository.save(promo.get());
+        PercentagePromo percentagePromo = promo.get();
+
+        percentagePromo.setName(request.getName());
+        percentagePromo.setDescription(request.getDescription());
+        percentagePromo.setMinimumPurchase(request.getMinimumPurchase());
+        percentagePromo.setPercentage(request.getPercentage());
+        percentagePromo.setExpirationDate(request.getExpirationDate());
+
+        if (isValid(percentagePromo)){
+            try {
+                percentagePromoRepository.save(percentagePromo);
+            } catch (ConstraintViolationException e) {
+                PromoResponse response = PromoResponse
+                        .builder()
+                        .message("Percent Promo name can't be empty!")
+                        .promo(percentagePromo)
+                        .build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+            PromoResponse response = PromoResponse
+                    .builder()
+                    .message("Percent Promo updated successfully!")
+                    .promo(percentagePromo)
+                    .build();
+
+            return ResponseEntity.ok(response);
+        }
+
+        PromoResponse response = PromoResponse
+                .builder()
+                .message("Percent Promo update failed! Invalid field(s)!")
+                .promo(percentagePromo)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @Override
-    public void delete(UUID id) {
-        Optional<PercentagePromo> promo = percentagePromoRepository.findById(id);
+    public boolean isValid(PercentagePromo promo) {
+        return isNotExpired(promo) && isNotNegativeMinPurchase(promo) && isNotNegativeDiscount(promo);
+    }
 
-        if (promo.isEmpty()) {
-            throw new NoSuchElementException();
-        }
+    @Override
+    public boolean isNotExpired(PercentagePromo promo) {
+        return promo.getExpirationDate().isAfter(LocalDateTime.now());
+    }
 
-        percentagePromoRepository.delete(promo.get());
+    @Override
+    public boolean isNotNegativeMinPurchase(PercentagePromo promo) {
+        return promo.getMinimumPurchase() >= 0;
+    }
+
+    @Override
+    public boolean isNotNegativeDiscount(PercentagePromo promo) {
+        return promo.getPercentage() >= 0;
     }
 }
