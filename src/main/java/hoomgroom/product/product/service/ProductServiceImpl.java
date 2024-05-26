@@ -3,19 +3,19 @@ package hoomgroom.product.product.service;
 import hoomgroom.product.product.dto.ProductData;
 import hoomgroom.product.product.model.Product;
 import hoomgroom.product.product.repository.ProductRepository;
-import hoomgroom.product.product.util.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import hoomgroom.product.product.util.DiscountFilter;
+import hoomgroom.product.product.util.PriceFilter;
+import hoomgroom.product.product.util.SearchFilter;
+import hoomgroom.product.product.util.TagFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     @Override
     public Product create(ProductData productData) {
@@ -28,38 +28,44 @@ public class ProductServiceImpl implements ProductService {
                 .discountPercentage(productData.getDiscountPercentage())
                 .totalSales(0)
                 .build();
-        productRepository.create(product);
-        return product;
+        return productRepository.save(product);
     }
 
     @Override
-    public Product update(UUID targetId, ProductData newData) {
-        Product product = productRepository.findById(targetId);
+    public Product update(UUID targetId, ProductData newData) throws NoSuchElementException {
+        Optional<Product> product = productRepository.findById(targetId);
+
+        if (product.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
         Product newProduct = Product.builder()
-                .id(product.getId())
+                .id(product.get().getId())
                 .name(newData.getName())
                 .tags(newData.getTags())
                 .description(newData.getDescription())
                 .imageLink(newData.getImageLink())
                 .originalPrice(newData.getOriginalPrice())
                 .discountPercentage(newData.getDiscountPercentage())
-                .totalSales(product.getTotalSales())
+                .totalSales(product.get().getTotalSales())
                 .build();
-        productRepository.update(targetId, newProduct);
-        return newProduct;
+        return productRepository.save(newProduct);
     }
 
     @Override
-    public void delete(UUID targetId) {
-        productRepository.delete(targetId);
+    public void delete(UUID targetId) throws NoSuchElementException {
+        Optional<Product> product = productRepository.findById(targetId);
+
+        if (product.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
+        productRepository.delete(product.get());
     }
 
     @Override
     public List<Product> findAll() {
-        Iterator<Product> productIterator = productRepository.findAll();
-        List<Product> allProduct = new ArrayList<>();
-        productIterator.forEachRemaining(allProduct::add);
-        return allProduct;
+        return productRepository.findAll();
     }
 
     @Override
@@ -70,11 +76,17 @@ public class ProductServiceImpl implements ProductService {
                 new DiscountFilter(maxDiscount)
         );
 
-        return searchFilter.filter(findAll());
+        return searchFilter.filter(productRepository.findAll());
     }
 
     @Override
-    public Product findById(UUID targetId) {
-        return productRepository.findById(targetId);
+    public Product findById(UUID targetId) throws NoSuchElementException {
+        Optional<Product> product = productRepository.findById(targetId);
+
+        if (product.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
+        return product.get();
     }
 }
