@@ -1,17 +1,21 @@
-package hoomgroom.product.Promo.service;
+package hoomgroom.product.promo.service;
 
-import hoomgroom.product.Promo.dto.FixedAmountPromoRequest;
-import hoomgroom.product.Promo.model.Factory.FixedAmountPromoFactory;
-import hoomgroom.product.Promo.model.FixedAmountPromo;
-import hoomgroom.product.Promo.repository.FixedAmountPromoRepository;
-import lombok.NonNull;
+import hoomgroom.product.promo.dto.FixedAmountPromoRequest;
+import hoomgroom.product.promo.dto.PromoResponse;
+import hoomgroom.product.promo.model.factory.FixedAmountPromoFactory;
+import hoomgroom.product.promo.model.FixedAmountPromo;
+import hoomgroom.product.promo.repository.FixedAmountPromoRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -19,56 +23,116 @@ public class FixedAmountPromoServiceImpl implements FixedAmountPromoService{
     private final FixedAmountPromoRepository fixedAmountPromoRepository;
 
     @Override
-    public List<FixedAmountPromo> findAll() {
-        return fixedAmountPromoRepository.findAll();
+    public CompletableFuture<List<FixedAmountPromo>> findAll() {
+        return CompletableFuture.supplyAsync(fixedAmountPromoRepository::findAll);
     }
 
     @Override
-    public FixedAmountPromo findById(@NonNull UUID id) throws NoSuchElementException {
-        Optional<FixedAmountPromo> promo = fixedAmountPromoRepository.findById(id);
-        if (promo.isEmpty()){
-            throw new NoSuchElementException();
-        }
-        return promo.get();
-    }
-
-    @Override
-    public FixedAmountPromo create(FixedAmountPromoRequest request) {
+    public CompletableFuture<ResponseEntity<PromoResponse>> create(FixedAmountPromoRequest request) {
         FixedAmountPromoFactory promoFactory = new FixedAmountPromoFactory();
         FixedAmountPromo promo = promoFactory.createPromo();
+
         promo.setName(request.getName());
         promo.setDescription(request.getDescription());
         promo.setMinimumPurchase(request.getMinimumPurchase());
         promo.setDiscountAmount(request.getDiscountAmount());
         promo.setExpirationDate(request.getExpirationDate());
-        fixedAmountPromoRepository.save(promo);
-        return promo;
+
+        if (isValid(promo)) {
+            try {
+                fixedAmountPromoRepository.save(promo);
+            } catch (ConstraintViolationException e) {
+                PromoResponse response = PromoResponse
+                        .builder()
+                        .message("Fixed Promo name can't be empty!")
+                        .promo(promo)
+                        .build();
+                return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
+            }
+
+            PromoResponse response = PromoResponse
+                    .builder()
+                    .message("Create Fixed Promo Success")
+                    .promo(promo)
+                    .build();
+            return CompletableFuture.completedFuture(ResponseEntity.ok(response));
+        }
+
+        PromoResponse response = PromoResponse
+                .builder()
+                .message("Create Fixed Promo Failed! Invalid field(s)")
+                .promo(promo)
+                .build();
+        return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
     }
 
     @Override
-    public FixedAmountPromo update(UUID id, FixedAmountPromoRequest request) {
+    public CompletableFuture<ResponseEntity<PromoResponse>> update(UUID id, FixedAmountPromoRequest request) {
         Optional<FixedAmountPromo> promo = fixedAmountPromoRepository.findById(id);
 
         if (promo.isEmpty()) {
-            throw new NoSuchElementException();
+            PromoResponse response = PromoResponse.builder()
+                    .message("Fixed Promo not found")
+                    .build();
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.NOT_FOUND).body(response));
         }
 
-        promo.get().setName(request.getName());
-        promo.get().setDescription(request.getDescription());
-        promo.get().setMinimumPurchase(request.getMinimumPurchase());
-        promo.get().setDiscountAmount(request.getDiscountAmount());
-        promo.get().setExpirationDate(request.getExpirationDate());
-        return fixedAmountPromoRepository.save(promo.get());
+        FixedAmountPromo fixedPromo = promo.get();
+
+        fixedPromo.setName(request.getName());
+        fixedPromo.setDescription(request.getDescription());
+        fixedPromo.setMinimumPurchase(request.getMinimumPurchase());
+        fixedPromo.setDiscountAmount(request.getDiscountAmount());
+        fixedPromo.setExpirationDate(request.getExpirationDate());
+
+        if (isValid(fixedPromo)){
+            try {
+                fixedAmountPromoRepository.save(fixedPromo);
+            } catch (ConstraintViolationException e) {
+                PromoResponse response = PromoResponse
+                        .builder()
+                        .message("Fixed Promo name can't be empty!")
+                        .promo(fixedPromo)
+                        .build();
+                CompletableFuture.completedFuture(response);
+            }
+
+            PromoResponse response = PromoResponse
+                    .builder()
+                    .message("Fixed Promo updated successfully!")
+                    .promo(fixedPromo)
+                    .build();
+
+            return CompletableFuture.completedFuture(ResponseEntity.ok(response));
+        }
+
+        PromoResponse response = PromoResponse
+                .builder()
+                .message("Fixed Promo update failed! Invalid field(s)!")
+                .promo(fixedPromo)
+                .build();
+
+        return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
+
     }
 
     @Override
-    public void delete(UUID id) {
-        Optional<FixedAmountPromo> promo = fixedAmountPromoRepository.findById(id);
+    public boolean isValid(FixedAmountPromo promo) {
+        return isNotExpired(promo) && isNotNegativeMinPurchase(promo) && isNotNegativeDiscount(promo);
+    }
 
-        if (promo.isEmpty()) {
-            throw new NoSuchElementException();
-        }
+    @Override
+    public boolean isNotExpired(FixedAmountPromo promo) {
+        return promo.getExpirationDate().isAfter(LocalDateTime.now());
+    }
 
-        fixedAmountPromoRepository.delete(promo.get());
+    @Override
+    public boolean isNotNegativeMinPurchase(FixedAmountPromo promo) {
+        return promo.getMinimumPurchase() >= 0;
+    }
+
+    @Override
+    public boolean isNotNegativeDiscount(FixedAmountPromo promo) {
+        return promo.getDiscountAmount() >= 0;
     }
 }
