@@ -1,4 +1,4 @@
-package hoomgroom.product.Product.model;
+package hoomgroom.product.product.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ProductTest {
+class ProductTest {
     Product product;
 
     @BeforeEach
