@@ -3,20 +3,18 @@ package hoomgroom.product.product.controller;
 import hoomgroom.product.product.dto.ProductData;
 import hoomgroom.product.product.model.Product;
 import hoomgroom.product.product.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/product")
+@RequiredArgsConstructor
 public class ProductController {
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
     @GetMapping("/list")
     public ResponseEntity<List<Product>> getAllProducts() {

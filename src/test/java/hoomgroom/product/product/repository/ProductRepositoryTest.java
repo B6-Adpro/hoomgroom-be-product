@@ -1,6 +1,6 @@
-package hoomgroom.product.Product.repository;
+package hoomgroom.product.product.repository;
 
-import hoomgroom.product.Product.model.Product;
+import hoomgroom.product.product.model.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +9,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ProductRepositoryTest {
+class ProductRepositoryTest {
     @Autowired
     ProductRepository productRepository;
 
