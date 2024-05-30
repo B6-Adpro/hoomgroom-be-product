@@ -3,7 +3,6 @@ package hoomgroom.product.product.util;
 import hoomgroom.product.product.model.Product;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PriceFilter extends SearchFilter {
     Long minPrice;
@@ -25,7 +24,7 @@ public class PriceFilter extends SearchFilter {
                     Long price = product.getDiscountedPrice();
                     return price >= minPrice && price <= maxPrice;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         return filterNext(filteredProducts);
     }

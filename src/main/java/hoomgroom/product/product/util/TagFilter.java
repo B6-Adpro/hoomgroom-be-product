@@ -4,7 +4,6 @@ import hoomgroom.product.product.model.Product;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TagFilter extends SearchFilter {
     List<String> tags;
@@ -21,7 +20,7 @@ public class TagFilter extends SearchFilter {
 
         List<Product> filteredProducts = products.stream()
                 .filter(product -> !Collections.disjoint(product.getTags(), this.tags))
-                .collect(Collectors.toList());
+                .toList();
 
         return filterNext(filteredProducts);
     }
