@@ -33,7 +33,7 @@ class PercentagePromoRequestTest {
 
     @Test
     void testToString() {
-        assertEquals("PercentagePromoRequest(name=null, description=null, expirationDate=null, minimumPurchase=null, percentage=null)",
-                PercentagePromoRequest.builder().build().toString());
+        assertEquals("PercentagePromoRequest.PercentagePromoRequestBuilder(name=null, description=null, expirationDate=null, minimumPurchase=null, percentage=null)",
+                PercentagePromoRequest.builder().toString());
     }
 }

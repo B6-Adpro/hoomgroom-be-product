@@ -186,12 +186,13 @@ class PercentagePromoServiceImplTest {
 
     @Test
     void testCreateValidPromo() {
-        PercentagePromoRequest request = new PercentagePromoRequest();
-        request.setName("Valid Promo");
-        request.setDescription("This is a valid promo");
-        request.setMinimumPurchase(100L);
-        request.setPercentage(10.0);
-        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+        PercentagePromoRequest request = PercentagePromoRequest.builder()
+                .name("Updated Promo")
+                .description("This is an updated promo")
+                .minimumPurchase(100L)
+                .percentage(10.0)
+                .expirationDate(LocalDateTime.now().plusDays(1))
+                .build();
 
         ResponseEntity<PromoResponse> responseEntity = promoService.create(request);
 
@@ -200,12 +201,13 @@ class PercentagePromoServiceImplTest {
 
     @Test
     void testCreateInvalidPromo_NegativeDiscount() {
-        PercentagePromoRequest request = new PercentagePromoRequest();
-        request.setName("Invalid Promo");
-        request.setDescription("This promo has a negative discount");
-        request.setMinimumPurchase(100L);
-        request.setPercentage(-10.0);
-        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+        PercentagePromoRequest request = PercentagePromoRequest.builder()
+                .name("Invalid Promo")
+                .description("negative discount promo")
+                .minimumPurchase(100L)
+                .percentage(-10.0)
+                .expirationDate(LocalDateTime.now().plusDays(1))
+                .build();
 
         ResponseEntity<PromoResponse> responseEntity = promoService.create(request);
 
@@ -215,12 +217,13 @@ class PercentagePromoServiceImplTest {
     @Test
     void testUpdate_PromoFoundButNotValid() {
         UUID id = UUID.randomUUID();
-        PercentagePromoRequest request = new PercentagePromoRequest();
-        request.setName("Updated Promo");
-        request.setDescription("This is an updated promo");
-        request.setMinimumPurchase(-50L);
-        request.setPercentage(20.0);
-        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+        PercentagePromoRequest request = PercentagePromoRequest.builder()
+                .name("Updated Promo")
+                .description("This is an updated promo")
+                .minimumPurchase(-50L)
+                .percentage(20.0)
+                .expirationDate(LocalDateTime.now().plusDays(1))
+                .build();
 
         PercentagePromo existingPromo = new PercentagePromo();
         existingPromo.setId(id);
@@ -241,12 +244,13 @@ class PercentagePromoServiceImplTest {
     @Test
     void testUpdate_Success() {
         UUID id = UUID.randomUUID();
-        PercentagePromoRequest request = new PercentagePromoRequest();
-        request.setName("Updated Promo");
-        request.setDescription("This is an updated promo");
-        request.setMinimumPurchase(100L);
-        request.setPercentage(20.0);
-        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+        PercentagePromoRequest request = PercentagePromoRequest.builder()
+                .name("Updated Promo")
+                .description("This is an updated promo")
+                .minimumPurchase(100L)
+                .percentage(20.0)
+                .expirationDate(LocalDateTime.now().plusDays(1))
+                .build();
 
         PercentagePromo existingPromo = new PercentagePromo();
         existingPromo.setId(id);
@@ -276,12 +280,13 @@ class PercentagePromoServiceImplTest {
     @Test
     void testUpdate_PromoNotFound() {
         UUID id = UUID.randomUUID();
-        PercentagePromoRequest request = new PercentagePromoRequest();
-        request.setName("Updated Promo");
-        request.setDescription("This is an updated promo");
-        request.setMinimumPurchase(100L);
-        request.setPercentage(20.0);
-        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+        PercentagePromoRequest request = PercentagePromoRequest.builder()
+                .name("Updated Promo")
+                .description("This is an updated promo")
+                .minimumPurchase(100L)
+                .percentage(20.0)
+                .expirationDate(LocalDateTime.now().plusDays(1))
+                .build();
 
         when(percentagePromoRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -295,12 +300,13 @@ class PercentagePromoServiceImplTest {
     @Test
     void testUpdate_PromoFoundButNotValidMinimum() {
         UUID id = UUID.randomUUID();
-        PercentagePromoRequest request = new PercentagePromoRequest();
-        request.setName("Updated Promo");
-        request.setDescription("This is an updated promo");
-        request.setMinimumPurchase(-50L);
-        request.setPercentage(20.0);
-        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+        PercentagePromoRequest request = PercentagePromoRequest.builder()
+                .name("Updated Promo")
+                .description("This is an updated promo")
+                .minimumPurchase(-50L)
+                .percentage(20.0)
+                .expirationDate(LocalDateTime.now().plusDays(1))
+                .build();
 
         PercentagePromo existingPromo = new PercentagePromo();
         existingPromo.setId(id);
