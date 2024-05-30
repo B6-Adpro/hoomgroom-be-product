@@ -61,9 +61,9 @@ jobs:
       - name: Test with Gradle
         env:
           PRODUCTION: test
-          JDBC_DATABASE_URL: ${{ secrets.JDBC_DATABASE_URL }}
-          JDBC_DATABASE_USERNAME: ${{ secrets.JDBC_DATABASE_USERNAME_TEST }}
-          JDBC_DATABASE_PASSWORD: ${{ secrets.JDBC_DATABASE_PASSWORD_TEST }}
+          JDBC_DATABASE_URL_TEST: ${{ secrets.JDBC_DATABASE_URL_TEST }}
+          JDBC_DATABASE_USERNAME_TEST: ${{ secrets.JDBC_DATABASE_USERNAME_TEST }}
+          JDBC_DATABASE_PASSWORD_TEST: ${{ secrets.JDBC_DATABASE_PASSWORD_TEST }}
         run: |
           ./gradlew check --info --stacktrace
           ./gradlew test
