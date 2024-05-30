@@ -37,4 +37,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-        run: ./gradlew build sonar --info --scan
+        run: |
+          echo "JDBC_DATABASE_URL: $JDBC_DATABASE_URL"
+          ./gradlew build sonar --info --scan
