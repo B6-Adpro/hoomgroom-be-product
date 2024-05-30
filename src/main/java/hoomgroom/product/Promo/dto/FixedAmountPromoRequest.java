@@ -4,10 +4,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Generated
 public class FixedAmountPromoRequest {
     private String name;
     private String description;

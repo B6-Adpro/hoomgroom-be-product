@@ -147,12 +147,13 @@ class FixedAmountPromoServiceImplTest {
 
     @Test
     void testCreate_ValidPromo() {
-        FixedAmountPromoRequest request = new FixedAmountPromoRequest();
-        request.setName("Valid Promo");
-        request.setDescription("This is a valid promo");
-        request.setMinimumPurchase(100L);
-        request.setDiscountAmount(10L);
-        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+        FixedAmountPromoRequest request = FixedAmountPromoRequest.builder()
+                .name("Valid Promo")
+                .description("This is a valid promo")
+                .minimumPurchase(100L)
+                .discountAmount(10L)
+                .expirationDate(LocalDateTime.now().plusDays(1))
+                .build();
 
         FixedAmountPromo promo = new FixedAmountPromo();
         promo.setName(request.getName());
@@ -171,12 +172,13 @@ class FixedAmountPromoServiceImplTest {
 
     @Test
     void testCreate_InvalidPromo() {
-        FixedAmountPromoRequest request = new FixedAmountPromoRequest();
-        request.setName("Invalid Promo");
-        request.setDescription("This promo is invalid");
-        request.setMinimumPurchase(-50L);
-        request.setDiscountAmount(10L);
-        request.setExpirationDate(LocalDateTime.now().minusDays(1));
+        FixedAmountPromoRequest request = FixedAmountPromoRequest.builder()
+                .name("Invalid Promo")
+                .description("This promo is invalid")
+                .minimumPurchase(-50L)
+                .discountAmount(10L)
+                .expirationDate(LocalDateTime.now().minusDays(1))
+                .build();
 
         ResponseEntity<PromoResponse> responseEntity = promoService.create(request);
 
@@ -186,12 +188,13 @@ class FixedAmountPromoServiceImplTest {
     @Test
     void testUpdate_Success() {
         UUID id = UUID.randomUUID();
-        FixedAmountPromoRequest request = new FixedAmountPromoRequest();
-        request.setName("Updated Promo");
-        request.setDescription("This is an updated promo");
-        request.setMinimumPurchase(100L);
-        request.setDiscountAmount(10L);
-        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+        FixedAmountPromoRequest request = FixedAmountPromoRequest.builder()
+                .name("Updated Promo")
+                .description("This is an updated promo")
+                .minimumPurchase(100L)
+                .discountAmount(10L)
+                .expirationDate(LocalDateTime.now().plusDays(1))
+                .build();
 
         FixedAmountPromo existingPromo = new FixedAmountPromo();
         existingPromo.setId(id);
@@ -221,12 +224,13 @@ class FixedAmountPromoServiceImplTest {
     @Test
     void testUpdate_PromoNotFound() {
         UUID id = UUID.randomUUID();
-        FixedAmountPromoRequest request = new FixedAmountPromoRequest();
-        request.setName("Updated Promo");
-        request.setDescription("This is an updated promo");
-        request.setMinimumPurchase(100L);
-        request.setDiscountAmount(10L);
-        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+        FixedAmountPromoRequest request = FixedAmountPromoRequest.builder()
+                .name("Updated Promo")
+                .description("This is an updated promo")
+                .minimumPurchase(100L)
+                .discountAmount(10L)
+                .expirationDate(LocalDateTime.now().plusDays(1))
+                .build();
 
         when(fixedAmountPromoRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -240,12 +244,13 @@ class FixedAmountPromoServiceImplTest {
     @Test
     void testUpdate_PromoFoundButNotValid() {
         UUID id = UUID.randomUUID();
-        FixedAmountPromoRequest request = new FixedAmountPromoRequest();
-        request.setName("Updated Promo");
-        request.setDescription("This is an updated promo");
-        request.setMinimumPurchase(-50L);
-        request.setDiscountAmount(10L);
-        request.setExpirationDate(LocalDateTime.now().plusDays(1));
+        FixedAmountPromoRequest request = FixedAmountPromoRequest.builder()
+                .name("Updated Promo")
+                .description("This is an updated promo")
+                .minimumPurchase(-50L)
+                .discountAmount(10L)
+                .expirationDate(LocalDateTime.now().plusDays(1))
+                .build();
 
         FixedAmountPromo existingPromo = new FixedAmountPromo();
         existingPromo.setId(id);
