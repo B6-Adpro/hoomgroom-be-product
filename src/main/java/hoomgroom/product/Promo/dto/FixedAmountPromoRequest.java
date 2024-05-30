@@ -1,6 +1,8 @@
 package hoomgroom.product.promo.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Generated;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 

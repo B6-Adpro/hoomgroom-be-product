@@ -6,7 +6,6 @@ import hoomgroom.product.promo.dto.Response;
 import hoomgroom.product.promo.model.FixedAmountPromo;
 import hoomgroom.product.promo.model.Promo;
 import hoomgroom.product.promo.model.factory.FixedAmountPromoFactory;
-import hoomgroom.product.promo.model.factory.PromoFactory;
 import hoomgroom.product.promo.repository.PromoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
