@@ -1,4 +1,4 @@
-package hoomgroom.product.Product.model;
+package hoomgroom.product.product.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,6 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
