@@ -30,9 +30,10 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build and analyze
         env:
-          JDBC_DATABASE_URL: ${{ secrets.JDBC_DATABASE_URL }}
-          JDBC_DATABASE_USERNAME: ${{ secrets.JDBC_DATABASE_USERNAME }}
-          JDBC_DATABASE_PASSWORD: ${{ secrets.JDBC_DATABASE_PASSWORD }}
+          PRODUCTION: test
+          JDBC_DATABASE_URL: ${{ secrets.JDBC_DATABASE_URL_TEST }}
+          JDBC_DATABASE_USERNAME: ${{ secrets.JDBC_DATABASE_USERNAME_TEST }}
+          JDBC_DATABASE_PASSWORD: ${{ secrets.JDBC_DATABASE_PASSWORD_TEST }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
