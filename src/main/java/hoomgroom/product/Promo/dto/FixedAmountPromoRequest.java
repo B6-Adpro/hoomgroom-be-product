@@ -1,13 +1,14 @@
 package hoomgroom.product.promo.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Generated;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Generated
 public class FixedAmountPromoRequest {
     private String name;
     private String description;

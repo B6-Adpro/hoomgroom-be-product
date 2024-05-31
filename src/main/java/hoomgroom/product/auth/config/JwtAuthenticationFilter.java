@@ -1,7 +1,7 @@
 package hoomgroom.product.auth.config;
 
 import hoomgroom.product.auth.model.User;
-import hoomgroom.product.auth.service.JwtServiceImpl;
+import hoomgroom.product.auth.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtServiceImpl jwtService;
+    private final JwtService jwtService;
     private static final String JWT_HEADER = "Authorization";
     private static final String JWT_TOKEN_PREFIX = "Bearer";
     @Override

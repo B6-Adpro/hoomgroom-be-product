@@ -33,7 +33,7 @@ class FixedAmountPromoRequestTest {
 
     @Test
     void testToString() {
-        assertEquals("FixedAmountPromoRequest(name=null, description=null, expirationDate=null, minimumPurchase=null, discountAmount=null)",
-                FixedAmountPromoRequest.builder().build().toString());
+        assertEquals("FixedAmountPromoRequest.FixedAmountPromoRequestBuilder(name=null, description=null, expirationDate=null, minimumPurchase=null, discountAmount=null)",
+                FixedAmountPromoRequest.builder().toString());
     }
 }

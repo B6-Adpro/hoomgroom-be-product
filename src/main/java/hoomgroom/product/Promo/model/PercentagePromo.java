@@ -16,7 +16,7 @@ public class PercentagePromo extends Promo {
 
     @Override
     public Long applyPromo(Long totalPrice) {
-        if (totalPrice > minimumPurchase) {
+        if (totalPrice >= minimumPurchase) {
             return (long) (100 - percentage) * totalPrice / 100;
         }
         return 0L;
