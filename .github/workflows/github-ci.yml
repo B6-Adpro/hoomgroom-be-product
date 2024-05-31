@@ -64,6 +64,7 @@ jobs:
           JDBC_DATABASE_URL_TEST: ${{ secrets.JDBC_DATABASE_URL_TEST }}
           JDBC_DATABASE_USERNAME_TEST: ${{ secrets.JDBC_DATABASE_USERNAME_TEST }}
           JDBC_DATABASE_PASSWORD_TEST: ${{ secrets.JDBC_DATABASE_PASSWORD_TEST }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         run: |
           ./gradlew check --info --stacktrace
           ./gradlew test
